@@ -25,6 +25,10 @@ unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode) {
     return micros() - start;
 }
 
+float HCSR04::convertMeasuredDistanceToCM(const float& measuredDistance) {
+    return (0.034f * measuredDistance) / 2;
+}
+
 Measurement HCSR04::measure() {
 
     digitalWrite(this->triggerPin, HIGH);
@@ -33,11 +37,22 @@ Measurement HCSR04::measure() {
 
     unsigned long distanceTimeMeasured = measureSignalLength(this->echoPin, HIGH);
 
-    if(distanceTimeMeasured >= TIMEOUT_SIGNAL_LENGTH_US) {
+    if (distanceTimeMeasured >= TIMEOUT_SIGNAL_LENGTH_US) {
         return {0.0, true};
-    } else {
-        float distanceCM = (0.034f * distanceTimeMeasured) / 2;
-        delay(COOL_DOWN_DELAY_MS);
-        return {distanceCM, false};
     }
+
+    delay(COOL_DOWN_DELAY_MS);
+
+    return {this->convertMeasuredDistanceToCM(distanceTimeMeasured), false};
 }
+/*
+Measurement HCSR04::measure(const unsigned int& samples) {
+
+    unsigned long total = 0;
+    for (int i = 0; i < samples; i++) {
+
+        Measurement measurement = this->measure();
+
+    }
+
+}*/

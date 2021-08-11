@@ -12,6 +12,7 @@
  * Multiple samples
  * Timeouts
  * Temperature hookup generic way (maybe just passer of temperature to be passed in given degree)
+ * Max distance, which can be present and returned in the object if exceed, but the timed out must be more specific in the variable name
  *
  * */
 
@@ -28,6 +29,7 @@ private:
     uint8_t echoPin;
 
     unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode);
+    float convertMeasuredDistanceToCM(const float& measuredDistance);
 
 public:
 
