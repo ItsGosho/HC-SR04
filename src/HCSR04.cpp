@@ -34,11 +34,9 @@ Measurement HCSR04::measure() {
     unsigned long distanceTimeMeasured = measureSignalLength(this->echoPin, HIGH);
 
     if(distanceTimeMeasured >= TIMEOUT_SIGNAL_LENGTH_US) {
-        //serial_printf(Serial, "Timed out! %l us.\n", distanceTimeMeasured);
         return {0.0, true};
     } else {
         float distanceCM = (0.034f * distanceTimeMeasured) / 2;
-        //serial_printf(Serial, "Distance: %2f cm. %2f m.\n", distanceCM, distanceCM / 100);
         delay(COOL_DOWN_DELAY_MS);
         return {distanceCM, false};
     }

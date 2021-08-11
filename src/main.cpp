@@ -41,6 +41,13 @@ void setup() {
 void loop() {
 
     if (isButtonPressed()) {
-        Serial.println(hcsr04.measure().distance);
+        Measurement measurement = hcsr04.measure();
+
+        if (measurement.isTimedOut) {
+            Serial.println("Measurement timed out!");
+        } else {
+            serial_printf(Serial, "Distance: %2f cm. %2f m.\n", measurement.distance, measurement.distance / 100);
+        }
+
     }
 }
