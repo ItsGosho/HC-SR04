@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SerialPrintF.h>
 
 #define SERIAL_BAUD_RATE 9600
 #define SR04_TRIGGER_PIN 10
@@ -66,8 +67,8 @@ void loop() {
         digitalWrite(SR04_TRIGGER_PIN, LOW);
 
         unsigned long distanceTimeMeasured = measureSignalLength(SR04_ECHO_PIN, HIGH);
-        Serial.println(distanceTimeMeasured);
+        float distanceCM = (0.034f * distanceTimeMeasured) / 2;
+        serial_printf(Serial, "Distance: %2f cm. %2f m.\n", distanceCM, distanceCM / 100);
         delay(SR04_COOL_DOWN_DELAY_MS);
-        Serial.println("Cool down period passed! You can measure again!");
     }
 }
