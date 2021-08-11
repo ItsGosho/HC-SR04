@@ -35,6 +35,7 @@ public:
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
     Measurement measure();
+    Measurement measure(const unsigned int& samples);
 };
 
 

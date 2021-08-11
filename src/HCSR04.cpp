@@ -45,14 +45,19 @@ Measurement HCSR04::measure() {
 
     return {this->convertMeasuredDistanceToCM(distanceTimeMeasured), false};
 }
-/*
+
 Measurement HCSR04::measure(const unsigned int& samples) {
 
-    unsigned long total = 0;
+    float total = 0;
     for (int i = 0; i < samples; i++) {
-
         Measurement measurement = this->measure();
 
+        if (measurement.isTimedOut) {
+            return {0.0, true};
+        } else {
+            total += measurement.distance;
+        }
     }
 
-}*/
+    return {total / samples, false};
+}
