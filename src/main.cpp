@@ -5,6 +5,7 @@
 #define SR04_TRIGGER_PIN 10
 #define SR04_ECHO_PIN 11
 #define SR04_TRIGGER_SIGNAL_LENGTH_US 10
+#define SR04_TIMEOUT_SIGNAL_LENGTH_US 38000
 #define SR04_COOL_DOWN_DELAY_MS 60
 #define TEST_BUTTON_PIN 12
 
@@ -67,8 +68,13 @@ void loop() {
         digitalWrite(SR04_TRIGGER_PIN, LOW);
 
         unsigned long distanceTimeMeasured = measureSignalLength(SR04_ECHO_PIN, HIGH);
-        float distanceCM = (0.034f * distanceTimeMeasured) / 2;
-        serial_printf(Serial, "Distance: %2f cm. %2f m.\n", distanceCM, distanceCM / 100);
-        delay(SR04_COOL_DOWN_DELAY_MS);
+
+        if(distanceTimeMeasured >= SR04_TIMEOUT_SIGNAL_LENGTH_US) {
+            serial_printf(Serial, "Timed out! %l us.\n", distanceTimeMeasured);
+        } else {
+            float distanceCM = (0.034f * distanceTimeMeasured) / 2;
+            serial_printf(Serial, "Distance: %2f cm. %2f m.\n", distanceCM, distanceCM / 100);
+            delay(SR04_COOL_DOWN_DELAY_MS);
+        }
     }
 }
