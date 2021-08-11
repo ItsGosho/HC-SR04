@@ -3,6 +3,8 @@
 #define SERIAL_BAUD_RATE 9600
 #define SR04_TRIGGER_PIN 10
 #define SR04_ECHO_PIN 11
+#define SR04_TRIGGER_SIGNAL_LENGTH_US 10
+#define SR04_COOL_DOWN_DELAY_MS 60
 #define TEST_BUTTON_PIN 12
 
 bool isButtonPressedAlready = false;
@@ -60,12 +62,12 @@ void loop() {
 
     if (isButtonPressed()) {
         digitalWrite(SR04_TRIGGER_PIN, HIGH);
-        delayMicroseconds(10);
+        delayMicroseconds(SR04_TRIGGER_SIGNAL_LENGTH_US);
         digitalWrite(SR04_TRIGGER_PIN, LOW);
 
         unsigned long distanceTimeMeasured = measureSignalLength(SR04_ECHO_PIN, HIGH);
         Serial.println(distanceTimeMeasured);
-        delay(60);
+        delay(SR04_COOL_DOWN_DELAY_MS);
         Serial.println("Cool down period passed! You can measure again!");
     }
 }
