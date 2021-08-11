@@ -28,14 +28,24 @@ bool isButtonPressed() {
     return false;
 }
 
-unsigned long measureSignalLength(String message, int signalType) {
+/**
+ * Will measure the length of a given signal.
+ * If the current signal is not the given one, then it will block until it is.
+ * If the current signal is the given one, then it will measure it directly.
+ *
+ * @param pin The digital pin, which will be used to determinate the signal
+ * @param mode HIGH or LOW
+ * @return The length of the given signal
+ */
+unsigned long measureSignalLength(const uint8_t& pin, const int& mode) {
+
+    while (digitalRead(pin) != mode);
 
     unsigned long start = micros();
-    while (digitalRead(SR04_ECHO_PIN) == signalType);
-    unsigned long timeUS = micros() - start;
 
-    Serial.println(message);
-    Serial.println(timeUS);
+    while (digitalRead(pin) == mode);
+
+    return micros() - start;
 }
 
 void setup() {
@@ -53,8 +63,8 @@ void loop() {
         delayMicroseconds(10);
         digitalWrite(SR04_TRIGGER_PIN, LOW);
 
-        measureSignalLength("8 burst pulses sending time!", LOW);
-        measureSignalLength("Distance time", HIGH);
+        unsigned long distanceTimeMeasured = measureSignalLength(SR04_ECHO_PIN, HIGH);
+        Serial.println(distanceTimeMeasured);
         delay(60);
         Serial.println("Cool down period passed! You can measure again!");
     }
