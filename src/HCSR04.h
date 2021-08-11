@@ -14,6 +14,12 @@
  * Temperature hookup generic way (maybe just passer of temperature to be passed in given degree)
  *
  * */
+
+struct Measurement {
+    float distance;
+    bool isTimedOut;
+};
+
 class HCSR04 {
 
 private:
@@ -26,7 +32,7 @@ private:
 public:
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
-    float measure();
+    Measurement measure();
 };
 
 

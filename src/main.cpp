@@ -41,6 +41,6 @@ void setup() {
 void loop() {
 
     if (isButtonPressed()) {
-        Serial.println(hcsr04.measure());
+        Serial.println(hcsr04.measure().distance);
     }
 }

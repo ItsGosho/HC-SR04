@@ -25,7 +25,7 @@ unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode) {
     return micros() - start;
 }
 
-float HCSR04::measure() {
+Measurement HCSR04::measure() {
 
     digitalWrite(this->triggerPin, HIGH);
     delayMicroseconds(TRIGGER_SIGNAL_LENGTH_US);
@@ -35,11 +35,11 @@ float HCSR04::measure() {
 
     if(distanceTimeMeasured >= TIMEOUT_SIGNAL_LENGTH_US) {
         //serial_printf(Serial, "Timed out! %l us.\n", distanceTimeMeasured);
-        return 0.0;
+        return {0.0, true};
     } else {
         float distanceCM = (0.034f * distanceTimeMeasured) / 2;
         //serial_printf(Serial, "Distance: %2f cm. %2f m.\n", distanceCM, distanceCM / 100);
         delay(COOL_DOWN_DELAY_MS);
-        return distanceCM;
+        return {distanceCM, false};
     }
 }
