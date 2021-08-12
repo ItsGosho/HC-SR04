@@ -25,7 +25,7 @@ unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode) {
     return micros() - start;
 }
 
-float HCSR04::convertMeasuredDistanceToCM(const float& signalLength) {
+float HCSR04::convertSignalLengthToDistanceCM(const float& signalLength) {
     return (0.034f * signalLength) / 2;
 }
 
@@ -42,7 +42,7 @@ Measurement HCSR04::measure() {
     if (signalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return {0.0, true};
 
-    return {this->convertMeasuredDistanceToCM(signalLength), false};
+    return {this->convertSignalLengthToDistanceCM(signalLength), false};
 }
 
 Measurement HCSR04::measure(const unsigned int& samples) {

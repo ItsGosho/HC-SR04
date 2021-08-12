@@ -29,7 +29,7 @@ private:
     uint8_t echoPin;
 
     unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode);
-    float convertMeasuredDistanceToCM(const float& signalLength);
+    float convertSignalLengthToDistanceCM(const float& signalLength);
 
 public:
 
