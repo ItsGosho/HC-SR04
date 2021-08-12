@@ -31,8 +31,10 @@ private:
     uint8_t echoPin;
 
     unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode);
-    float convertSignalLengthToDistanceCM(const float& signalLength);
-    float calculateSoundSpeedAir(const float& temperature);
+    float calculateDistanceBySignalLength(const unsigned int& signalLength);
+    float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed);
+    float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
+    float calculateSoundSpeed(const float& temperature);
 
 public:
 

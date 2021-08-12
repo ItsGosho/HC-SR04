@@ -25,8 +25,40 @@ unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode) {
     return micros() - start;
 }
 
-float HCSR04::convertSignalLengthToDistanceCM(const float& signalLength) {
-    return (0.034f * signalLength) / 2;
+/**
+ * Will convert the signal length to the actual distance in cm.
+ * The signal length represents the time the signal travelled per cm/us.
+ * Note that here we assume the sound speed is 340.
+ * It is dependent on various factors.
+ *
+ * @param signalLength The length of the HIGH signal from the HC-SR04 in microseconds
+ * @return The distance that the sensor measured in cm
+ */
+float HCSR04::calculateDistanceBySignalLength(const unsigned int& signalLength) {
+    return this->calculateDistanceBySignalLengthAndSoundSpeed(signalLength, 340);
+}
+
+/**
+ * Will convert the signal length to the actual distance in cm.
+ * The signal length represents the time the signal travelled per cm/us.
+ *
+ * @param signalLength The length of the HIGH signal from the HC-SR04 in microseconds
+ * @param soundSpeed The speed of the sound in meters per second
+ * @return The distance that the sensor measured in cm
+ */
+float HCSR04::calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed) {
+    float soundSpeedInCentimetersPerMicrosecond = this->convertMetersPerSecondToCentimetersPerMicrosecond(soundSpeed);
+    return (soundSpeedInCentimetersPerMicrosecond * signalLength) / 2;
+}
+
+/**
+ * Will convert meters per second to centimeters per microsecond/
+ *
+ * @param metersPerSecond The meters per second that will be converted
+ * @return The converted meters per second into centimeters per microsecond
+ */
+float HCSR04::convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond) {
+    return metersPerSecond * 0.0001f;
 }
 
 /**
@@ -38,7 +70,7 @@ float HCSR04::convertSignalLengthToDistanceCM(const float& signalLength) {
  * @param temperature The ambient temperature
  * @return The speed of sound in m/s
  */
-float HCSR04::calculateSoundSpeedAir(const float& temperature) {
+float HCSR04::calculateSoundSpeed(const float& temperature) {
     return 331.0f + (0.6f * temperature);
 }
 
@@ -55,7 +87,7 @@ Measurement HCSR04::measure() {
     if (signalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return {0.0, true};
 
-    return {this->convertSignalLengthToDistanceCM(signalLength), false};
+    return {this->calculateDistanceBySignalLength(signalLength), false};
 }
 
 Measurement HCSR04::measure(const unsigned int& samples) {
