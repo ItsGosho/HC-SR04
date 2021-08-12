@@ -23,13 +23,12 @@ private:
     DistanceUnit* distanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
-    float* humidityPercentage;
 
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, unsigned int* distance, float* temperature, float* humidityPercentage)
-            : timeoutMS(timeoutMs), samples(samples), distance(distance), temperature(temperature), humidityPercentage(humidityPercentage) {
+    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, unsigned int* distance, float* temperature)
+            : timeoutMS(timeoutMs), samples(samples), distance(distance), temperature(temperature) {
     }
 
     unsigned int* getTimeoutMS() const {
@@ -54,10 +53,6 @@ public:
 
     TemperatureUnit* getTemperatureUnit() const {
         return this->temperatureUnit;
-    }
-
-    float* getHumidityPercentage() const {
-        return this->humidityPercentage;
     }
 };
 
@@ -105,18 +100,12 @@ public:
         return *this;
     }
 
-    builder& withHumidity(const float& humidityPercentage) {
-        this->humidityPercentage = &const_cast<float&>(humidityPercentage);
-        return *this;
-    }
-
     MeasurementConfiguration build() const {
 
         return MeasurementConfiguration(this->timeoutMS,
                                         this->samples,
                                         this->distance,
-                                        this->temperature,
-                                        this->humidityPercentage);
+                                        this->temperature);
     }
 
 };

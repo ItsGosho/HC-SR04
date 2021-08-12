@@ -29,6 +29,19 @@ float HCSR04::convertSignalLengthToDistanceCM(const float& signalLength) {
     return (0.034f * signalLength) / 2;
 }
 
+/**
+ * The speed of sound in air is dependent on the temperature & other factors such as air pressure and humidity.
+ * The temperature plays more important role that the other two.
+ *
+ * https://www.engineeringtoolbox.com/air-speed-sound-d_603.html
+ *
+ * @param temperature The ambient temperature
+ * @return The speed of sound in m/s
+ */
+float HCSR04::calculateSoundSpeedAir(const float& temperature) {
+    return 331.0f + (0.6f * temperature);
+}
+
 Measurement HCSR04::measure() {
 
     digitalWrite(this->triggerPin, HIGH);
@@ -59,4 +72,8 @@ Measurement HCSR04::measure(const unsigned int& samples) {
     }
 
     return {total / samples, false};
+}
+
+Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
+    return Measurement();
 }

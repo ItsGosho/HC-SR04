@@ -2,6 +2,7 @@
 #define HC_SR04_HCSR04_H
 
 #include <Arduino.h>
+#include <MeasurementConfiguration.h>
 
 #define TRIGGER_SIGNAL_LENGTH_US 10
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
@@ -13,6 +14,7 @@
  * Timeouts
  * Temperature hookup generic way (maybe just passer of temperature to be passed in given degree)
  * Max distance, which can be present and returned in the object if exceed, but the timed out must be more specific in the variable name
+ * ONE WIRE MODE
  *
  * */
 
@@ -30,12 +32,14 @@ private:
 
     unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode);
     float convertSignalLengthToDistanceCM(const float& signalLength);
+    float calculateSoundSpeedAir(const float& temperature);
 
 public:
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
     Measurement measure();
     Measurement measure(const unsigned int& samples);
+    Measurement measure(const MeasurementConfiguration& configuration);
 };
 
 
