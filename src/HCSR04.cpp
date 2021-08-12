@@ -48,7 +48,7 @@ float HCSR04::calculateDistanceBySignalLength(const unsigned int& signalLength) 
  */
 float HCSR04::calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed) {
     float soundSpeedInCentimetersPerMicrosecond = this->convertMetersPerSecondToCentimetersPerMicrosecond(soundSpeed);
-    return (soundSpeedInCentimetersPerMicrosecond * signalLength) / 2;
+    return (soundSpeedInCentimetersPerMicrosecond * static_cast<float>(signalLength)) / 2;
 }
 
 /**
