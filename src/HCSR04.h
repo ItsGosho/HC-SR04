@@ -20,8 +20,12 @@
  * */
 
 struct Measurement {
+
     float distance;
+    DistanceUnit distanceUnit;
     bool isTimedOut;
+    bool isMaxDistanceExceeded;
+
 };
 
 class HCSR04 {

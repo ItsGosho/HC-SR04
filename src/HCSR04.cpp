@@ -90,9 +90,9 @@ Measurement HCSR04::measure() {
     delay(COOL_DOWN_DELAY_MS);
 
     if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
-        return {0.0, true};
+        return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
 
-    return {this->calculateDistanceBySignalLength(responseSignalLength), false};
+    return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false}
 }
 
 Measurement HCSR04::measure(const unsigned int& samples) {
@@ -102,25 +102,26 @@ Measurement HCSR04::measure(const unsigned int& samples) {
     for (int i = 0; i < samples; i++) {
         Measurement measurement = this->measure();
 
-        if(measurement.isTimedOut)
-            return {0.0, true};
+        if (measurement.isTimedOut)
+            return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
 
         total += measurement.distance;
     }
 
-    return {total / samples, false};
+    float averageDistanceInCentimeters = total / static_cast<float>(samples);
+    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false}
 }
 
 Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
 
     Measurement measurement{};
 
-    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit()) {
-
-    }
-
     if (configuration.getSamples()) {
         measurement = this->measure(*configuration.getSamples());
+    }
+
+    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit()) {
+        //measurement.isMaxDistanceExceeded = measurement.distance
     }
 
     if (configuration.getTimeoutMS()) {
