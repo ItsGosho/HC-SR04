@@ -23,6 +23,7 @@ private:
     DistanceUnit* distanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
+    bool excludeTimeouts;
 
 public:
     class builder;
@@ -54,6 +55,7 @@ public:
     TemperatureUnit* getTemperatureUnit() const {
         return this->temperatureUnit;
     }
+
 };
 
 class MeasurementConfiguration::builder {

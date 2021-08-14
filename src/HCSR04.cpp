@@ -67,18 +67,23 @@ float HCSR04::convertMetersPerSecondToCentimetersPerMicrosecond(const float& met
  *
  * https://www.engineeringtoolbox.com/air-speed-sound-d_603.html
  *
- * @param temperature The ambient temperature
+ * @param temperature The ambient temperature in celsius
  * @return The speed of sound in m/s
  */
 float HCSR04::calculateSoundSpeed(const float& temperature) {
     return 331.0f + (0.6f * temperature);
 }
 
-Measurement HCSR04::measure() {
+void HCSR04::sendTriggerSignal() {
 
     digitalWrite(this->triggerPin, HIGH);
     delayMicroseconds(TRIGGER_SIGNAL_LENGTH_US);
     digitalWrite(this->triggerPin, LOW);
+}
+
+Measurement HCSR04::measure() {
+
+    this->sendTriggerSignal();
 
     unsigned long signalLength = measureSignalLength(this->echoPin, HIGH);
 
@@ -107,5 +112,24 @@ Measurement HCSR04::measure(const unsigned int& samples) {
 }
 
 Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
-    return Measurement();
+
+    Measurement measurement{};
+
+    if (configuration.getDistance()) {
+
+    }
+
+    if (configuration.getSamples()) {
+        measurement = this->measure(*configuration.getSamples());
+    }
+
+    if (configuration.getTimeoutMS()) {
+
+    }
+
+    if (configuration.getTemperature()) {
+
+    }
+
+    return measurement;
 }

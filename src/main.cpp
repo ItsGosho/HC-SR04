@@ -41,20 +41,27 @@ void setup() {
 void loop() {
 
     if (isButtonPressed()) {
-        Measurement measurement = hcsr04.measure();
 
-        if (measurement.isTimedOut) {
+        Measurement measurement1Sample = hcsr04.measure(
+                MeasurementConfiguration::builder()
+                        .withSamples(1)
+                        .build());
+
+        if (measurement1Sample.isTimedOut) {
             Serial.println("Measurement timed out!");
         } else {
-            serial_printf(Serial, "Distance: %2f cm. %2f m.\n", measurement.distance, measurement.distance / 100);
+            serial_printf(Serial, "Distance: %2f cm. %2f m.\n", measurement1Sample.distance, measurement1Sample.distance / 100);
         }
 
-        Measurement measurementMultiple = hcsr04.measure(5);
+        Measurement measurement5Samples = hcsr04.measure(
+                MeasurementConfiguration::builder()
+                        .withSamples(5)
+                        .build());
 
-        if (measurementMultiple.isTimedOut) {
+        if (measurement5Samples.isTimedOut) {
             Serial.println("[M] Measurement timed out!");
         } else {
-            serial_printf(Serial, "[M] Distance: %2f cm. %2f m.\n", measurementMultiple.distance, measurementMultiple.distance / 100);
+            serial_printf(Serial, "[M] Distance: %2f cm. %2f m.\n", measurement5Samples.distance, measurement5Samples.distance / 100);
         }
 
     }
