@@ -19,8 +19,8 @@ private:
 
     unsigned int* timeoutMS;
     unsigned int* samples;
-    unsigned int* distance;
-    DistanceUnit* distanceUnit;
+    unsigned int* maxDistance;
+    DistanceUnit* maxDistanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
     bool excludeTimeouts;
@@ -28,8 +28,8 @@ private:
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, unsigned int* distance, float* temperature)
-            : timeoutMS(timeoutMs), samples(samples), distance(distance), temperature(temperature) {
+    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, unsigned int* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
+            : timeoutMS(timeoutMs), samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature) {
     }
 
     unsigned int* getTimeoutMS() const {
@@ -40,12 +40,12 @@ public:
         return this->samples;
     }
 
-    unsigned int* getDistance() const {
-        return this->distance;
+    unsigned int* getMaxDistance() const {
+        return this->maxDistance;
     }
 
-    DistanceUnit* getDistanceUnit() const {
-        return this->distanceUnit;
+    DistanceUnit* getMaxDistanceUnit() const {
+        return this->maxDistanceUnit;
     }
 
     float* getTemperature() const {
@@ -63,8 +63,8 @@ class MeasurementConfiguration::builder {
 private:
     unsigned int* timeoutMS;
     unsigned int* samples;
-    unsigned int* distance;
-    DistanceUnit* distanceUnit;
+    unsigned int* maxDistance;
+    DistanceUnit* maxDistanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
     float* humidityPercentage;
@@ -73,8 +73,8 @@ public:
     builder() {
         this->timeoutMS = nullptr;
         this->samples = nullptr;
-        this->distance = nullptr;
-        this->distanceUnit = nullptr;
+        this->maxDistance = nullptr;
+        this->maxDistanceUnit = nullptr;
         this->temperature = nullptr;
         this->temperatureUnit = nullptr;
         this->humidityPercentage = nullptr;
@@ -90,9 +90,9 @@ public:
         return *this;
     }
 
-    builder& withDistance(const unsigned int& distance, const DistanceUnit& distanceUnit) {
-        this->distance = &const_cast<unsigned int&>(distance);
-        this->distanceUnit = &const_cast<DistanceUnit&>(distanceUnit);
+    builder& withMaxDistance(const unsigned int& maxDistance, const DistanceUnit& maxDistanceUnit) {
+        this->maxDistance = &const_cast<unsigned int&>(maxDistance);
+        this->maxDistanceUnit = &const_cast<DistanceUnit&>(maxDistanceUnit);
         return *this;
     }
 
@@ -106,7 +106,8 @@ public:
 
         return MeasurementConfiguration(this->timeoutMS,
                                         this->samples,
-                                        this->distance,
+                                        this->maxDistance,
+                                        this->maxDistanceUnit,
                                         this->temperature);
     }
 

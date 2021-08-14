@@ -85,14 +85,14 @@ Measurement HCSR04::measure() {
 
     this->sendTriggerSignal();
 
-    unsigned long signalLength = measureSignalLength(this->echoPin, HIGH);
+    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
 
     delay(COOL_DOWN_DELAY_MS);
 
-    if (signalLength >= TIMEOUT_SIGNAL_LENGTH_US)
+    if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return {0.0, true};
 
-    return {this->calculateDistanceBySignalLength(signalLength), false};
+    return {this->calculateDistanceBySignalLength(responseSignalLength), false};
 }
 
 Measurement HCSR04::measure(const unsigned int& samples) {
@@ -115,7 +115,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
 
     Measurement measurement{};
 
-    if (configuration.getDistance()) {
+    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit()) {
 
     }
 
@@ -127,7 +127,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
 
     }
 
-    if (configuration.getTemperature()) {
+    if (configuration.getTemperature() && configuration.getTemperatureUnit()) {
 
     }
 
