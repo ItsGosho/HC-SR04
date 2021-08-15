@@ -40,14 +40,17 @@ private:
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed);
     float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
     float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit);
-    float calculateSoundSpeed(const float& temperature);
+    float convertTemperatureUnit(const float& temperature, const TemperatureUnit& fromUnit, const TemperatureUnit& toUnit);
+    float calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
     void sendTriggerSignal();
 
 public:
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
     Measurement measure();
-    Measurement measure(const unsigned int& samples);
+    Measurement HCSR04::measureWithTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
+    Measurement measureWithSamples(const unsigned int& samples);
+    Measurement HCSR04::measureWithSamplesAndTemperature(const unsigned int& samples, const float& temperature, const TemperatureUnit& temperatureUnit);
     Measurement measure(const MeasurementConfiguration& configuration);
 };
 

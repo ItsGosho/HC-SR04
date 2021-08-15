@@ -67,11 +67,13 @@ float HCSR04::convertMetersPerSecondToCentimetersPerMicrosecond(const float& met
  *
  * https://www.engineeringtoolbox.com/air-speed-sound-d_603.html
  *
- * @param temperature The ambient temperature in celsius
+ * @param temperature The ambient temperature
+ * @param temperatureUnit The unit of the temperature
  * @return The speed of sound in m/s
  */
-float HCSR04::calculateSoundSpeed(const float& temperature) {
-    return 331.0f + (0.6f * temperature);
+float HCSR04::calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
+    float temperatureInCelsius = this->convertTemperatureUnit(temperature, temperatureUnit, TemperatureUnit::CELSIUS);
+    return 331.0f + (0.6f * temperatureInCelsius);
 }
 
 float HCSR04::convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit) {
@@ -108,6 +110,40 @@ float HCSR04::convertDistanceUnit(const float& distance, const DistanceUnit& fro
     return -1;
 }
 
+float HCSR04::convertTemperatureUnit(const float& temperature, const TemperatureUnit& fromUnit, const TemperatureUnit& toUnit) {
+
+    switch (fromUnit) {
+
+        case TemperatureUnit::CELSIUS:
+
+            switch (toUnit) {
+
+                case TemperatureUnit::CELSIUS:
+                    return temperature;
+
+                case TemperatureUnit::FAHRENHEIT:
+                    return temperature * 1.8f + 32;
+            }
+
+            break;
+
+        case TemperatureUnit::FAHRENHEIT:
+
+            switch (toUnit) {
+
+                case TemperatureUnit::CELSIUS:
+                    return (temperature - 32) * 0.5556f;
+
+                case TemperatureUnit::FAHRENHEIT:
+                    return temperature;
+            }
+
+            break;
+    }
+
+    return -1;
+}
+
 void HCSR04::sendTriggerSignal() {
 
     digitalWrite(this->triggerPin, HIGH);
@@ -129,7 +165,25 @@ Measurement HCSR04::measure() {
     return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false};
 }
 
-Measurement HCSR04::measure(const unsigned int& samples) {
+Measurement HCSR04::measureWithTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
+
+    this->sendTriggerSignal();
+
+    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
+
+    delay(COOL_DOWN_DELAY_MS);
+
+    if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
+        return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
+
+    float soundSpeed = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
+    float distanceInCM = this->calculateDistanceBySignalLengthAndSoundSpeed(responseSignalLength, soundSpeed);
+
+    return Measurement{distanceInCM, DistanceUnit::CENTIMETERS, false, false};
+}
+
+
+Measurement HCSR04::measureWithSamples(const unsigned int& samples) {
 
     float total = 0;
 
@@ -146,12 +200,39 @@ Measurement HCSR04::measure(const unsigned int& samples) {
     return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false};
 }
 
+Measurement HCSR04::measureWithSamplesAndTemperature(const unsigned int& samples, const float& temperature, const TemperatureUnit& temperatureUnit) {
+
+    float total = 0;
+
+    for (int i = 0; i < samples; i++) {
+        Measurement measurement = this->measureWithTemperature(temperature, temperatureUnit);
+
+        if (measurement.isTimedOut)
+            return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
+
+        total += measurement.distance;
+    }
+
+    float averageDistanceInCentimeters = total / static_cast<float>(samples);
+    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false};
+}
+
 Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
 
     Measurement measurement{};
 
-    if (configuration.getSamples()) {
-        measurement = this->measure(*configuration.getSamples());
+    if (configuration.getSamples() && configuration.getTemperature() && configuration.getTemperatureUnit()) {
+        /*TODO: Temperature Unit*/
+        measurement = this->measureWithSamplesAndTemperature(*configuration.getSamples(),
+                                                             *configuration.getTemperature(),
+                                                             *configuration.getTemperatureUnit());
+
+    } else if (configuration.getTemperature() && configuration.getTemperatureUnit()) {
+        /*TODO: Temperature Unit*/
+        measurement = this->measureWithTemperature(*configuration.getTemperature(), *configuration.getTemperatureUnit());
+
+    } else if (configuration.getSamples()) {
+        measurement = this->measureWithSamples(*configuration.getSamples());
     }
 
     if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit() && !measurement.isTimedOut) {
@@ -161,10 +242,6 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
     }
 
     if (configuration.getTimeoutMS()) {
-
-    }
-
-    if (configuration.getTemperature() && configuration.getTemperatureUnit()) {
 
     }
 
