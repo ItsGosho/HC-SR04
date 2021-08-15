@@ -221,17 +221,19 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
 
     Measurement measurement{};
 
-    if (configuration.getSamples() && configuration.getTemperature() && configuration.getTemperatureUnit()) {
-        /*TODO: Temperature Unit*/
+    bool isMeasureWithTemperature = configuration.getTemperature() && configuration.getTemperatureUnit();
+    bool isMeasureWithSamples = configuration.getSamples();
+
+    if (isMeasureWithSamples && isMeasureWithTemperature) {
         measurement = this->measureWithSamplesAndTemperature(*configuration.getSamples(),
                                                              *configuration.getTemperature(),
                                                              *configuration.getTemperatureUnit());
 
-    } else if (configuration.getTemperature() && configuration.getTemperatureUnit()) {
-        /*TODO: Temperature Unit*/
-        measurement = this->measureWithTemperature(*configuration.getTemperature(), *configuration.getTemperatureUnit());
+    } else if (isMeasureWithTemperature) {
+        measurement = this->measureWithTemperature(*configuration.getTemperature(),
+                                                   *configuration.getTemperatureUnit());
 
-    } else if (configuration.getSamples()) {
+    } else if (isMeasureWithSamples) {
         measurement = this->measureWithSamples(*configuration.getSamples());
     }
 
@@ -241,9 +243,6 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
                                                                       *configuration.getMaxDistanceUnit()) > *configuration.getMaxDistance();
     }
 
-    if (configuration.getTimeoutMS()) {
-
-    }
-
     return measurement;
 }
+

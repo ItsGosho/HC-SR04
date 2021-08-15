@@ -17,7 +17,6 @@ class MeasurementConfiguration {
 
 private:
 
-    unsigned int* timeoutMS;
     unsigned int* samples;
     float* maxDistance;
     DistanceUnit* maxDistanceUnit;
@@ -28,12 +27,8 @@ private:
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
-            : timeoutMS(timeoutMs), samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature) {
-    }
-
-    unsigned int* getTimeoutMS() const {
-        return this->timeoutMS;
+    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
+            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature) {
     }
 
     unsigned int* getSamples() const {
@@ -61,7 +56,6 @@ public:
 class MeasurementConfiguration::builder {
 
 private:
-    unsigned int* timeoutMS;
     unsigned int* samples;
     float* maxDistance;
     DistanceUnit* maxDistanceUnit;
@@ -71,18 +65,12 @@ private:
 
 public:
     builder() {
-        this->timeoutMS = nullptr;
         this->samples = nullptr;
         this->maxDistance = nullptr;
         this->maxDistanceUnit = nullptr;
         this->temperature = nullptr;
         this->temperatureUnit = nullptr;
         this->humidityPercentage = nullptr;
-    }
-
-    builder& withTimeoutMS(const unsigned int& timeoutMS) {
-        this->timeoutMS = &const_cast<unsigned int&>(timeoutMS);
-        return *this;
     }
 
     builder& withSamples(const unsigned int& samples) {
@@ -104,8 +92,7 @@ public:
 
     MeasurementConfiguration build() const {
 
-        return MeasurementConfiguration(this->timeoutMS,
-                                        this->samples,
+        return MeasurementConfiguration(this->samples,
                                         this->maxDistance,
                                         this->maxDistanceUnit,
                                         this->temperature);
