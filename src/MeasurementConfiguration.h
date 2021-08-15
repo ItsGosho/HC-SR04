@@ -4,13 +4,16 @@
 #include "Arduino.h"
 
 enum class TemperatureUnit {
-    CELSIUS,
-    FAHRENHEIT
+    CELSIUS, FAHRENHEIT
 };
 
 enum class DistanceUnit {
-    CENTIMETERS,
-    METERS
+
+    //Metric
+    CENTIMETERS, METERS,
+
+    //Imperial
+    INCH, FEET, YARD
 };
 
 class MeasurementConfiguration {
@@ -27,7 +30,7 @@ private:
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
+    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature)
             : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature) {
     }
 
@@ -92,10 +95,7 @@ public:
 
     MeasurementConfiguration build() const {
 
-        return MeasurementConfiguration(this->samples,
-                                        this->maxDistance,
-                                        this->maxDistanceUnit,
-                                        this->temperature);
+        return MeasurementConfiguration(this->samples, this->maxDistance, this->maxDistanceUnit, this->temperature);
     }
 
 };
