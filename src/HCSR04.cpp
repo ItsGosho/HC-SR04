@@ -74,6 +74,40 @@ float HCSR04::calculateSoundSpeed(const float& temperature) {
     return 331.0f + (0.6f * temperature);
 }
 
+float HCSR04::convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit) {
+
+    switch (fromUnit) {
+
+        case DistanceUnit::CENTIMETERS:
+
+            switch (toUnit) {
+
+                case DistanceUnit::CENTIMETERS:
+                    return distance;
+
+                case DistanceUnit::METERS:
+                    return distance / 100.00f;
+            }
+
+            break;
+
+        case DistanceUnit::METERS:
+
+            switch (toUnit) {
+
+                case DistanceUnit::CENTIMETERS:
+                    return distance * 100.00f;
+
+                case DistanceUnit::METERS:
+                    return distance;
+            }
+
+            break;
+    }
+
+    return -1;
+}
+
 void HCSR04::sendTriggerSignal() {
 
     digitalWrite(this->triggerPin, HIGH);
@@ -92,7 +126,7 @@ Measurement HCSR04::measure() {
     if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
 
-    return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false}
+    return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false};
 }
 
 Measurement HCSR04::measure(const unsigned int& samples) {
@@ -109,7 +143,7 @@ Measurement HCSR04::measure(const unsigned int& samples) {
     }
 
     float averageDistanceInCentimeters = total / static_cast<float>(samples);
-    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false}
+    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false};
 }
 
 Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
@@ -120,8 +154,10 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
         measurement = this->measure(*configuration.getSamples());
     }
 
-    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit()) {
-        //measurement.isMaxDistanceExceeded = measurement.distance
+    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit() && !measurement.isTimedOut) {
+        measurement.isMaxDistanceExceeded = this->convertDistanceUnit(measurement.distance,
+                                                                      measurement.distanceUnit,
+                                                                      *configuration.getMaxDistanceUnit()) > *configuration.getMaxDistance();
     }
 
     if (configuration.getTimeoutMS()) {

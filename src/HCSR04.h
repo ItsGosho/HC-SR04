@@ -39,6 +39,7 @@ private:
     float calculateDistanceBySignalLength(const unsigned int& signalLength);
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed);
     float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
+    float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit);
     float calculateSoundSpeed(const float& temperature);
     void sendTriggerSignal();
 

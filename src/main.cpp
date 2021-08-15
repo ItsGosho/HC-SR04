@@ -32,6 +32,19 @@ bool isButtonPressed() {
     return false;
 }
 
+void printMeasurement(Measurement measurement) {
+
+    if (measurement.isTimedOut) {
+        Serial.println("Measurement timed out!");
+    } else {
+        serial_printf(Serial,
+                      "Distance: %2f %s, Max Distance Exceeded: %o\n",
+                      measurement.distance,
+                      measurement.distanceUnit == DistanceUnit::CENTIMETERS ? "cm" : "m",
+                      measurement.isMaxDistanceExceeded);
+    }
+}
+
 void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
 
@@ -42,27 +55,18 @@ void loop() {
 
     if (isButtonPressed()) {
 
-        Measurement measurement1Sample = hcsr04.measure(
-                MeasurementConfiguration::builder()
-                        .withSamples(1)
-                        .build());
+        Measurement measurement1Sample = hcsr04.measure(MeasurementConfiguration::builder().withSamples(1).withMaxDistance(
+                10,
+                DistanceUnit::CENTIMETERS).build());
 
-        if (measurement1Sample.isTimedOut) {
-            Serial.println("Measurement timed out!");
-        } else {
-            serial_printf(Serial, "Distance: %2f cm. %2f m.\n", measurement1Sample.distance, measurement1Sample.distance / 100);
-        }
+        printMeasurement(measurement1Sample);
 
-        Measurement measurement5Samples = hcsr04.measure(
-                MeasurementConfiguration::builder()
-                        .withSamples(5)
-                        .build());
+        Measurement measurement5Samples = hcsr04.measure(MeasurementConfiguration::builder().withSamples(5).withMaxDistance(
+                10,
+                DistanceUnit::CENTIMETERS).build());
 
-        if (measurement5Samples.isTimedOut) {
-            Serial.println("[M] Measurement timed out!");
-        } else {
-            serial_printf(Serial, "[M] Distance: %2f cm. %2f m.\n", measurement5Samples.distance, measurement5Samples.distance / 100);
-        }
+        printMeasurement(measurement5Samples);
 
+        Serial.println("----------------------------------");
     }
 }

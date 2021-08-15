@@ -19,7 +19,7 @@ private:
 
     unsigned int* timeoutMS;
     unsigned int* samples;
-    unsigned int* maxDistance;
+    float* maxDistance;
     DistanceUnit* maxDistanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
@@ -28,7 +28,7 @@ private:
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, unsigned int* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
+    MeasurementConfiguration(unsigned int* timeoutMs, unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit , float* temperature)
             : timeoutMS(timeoutMs), samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature) {
     }
 
@@ -40,7 +40,7 @@ public:
         return this->samples;
     }
 
-    unsigned int* getMaxDistance() const {
+    float* getMaxDistance() const {
         return this->maxDistance;
     }
 
@@ -63,7 +63,7 @@ class MeasurementConfiguration::builder {
 private:
     unsigned int* timeoutMS;
     unsigned int* samples;
-    unsigned int* maxDistance;
+    float* maxDistance;
     DistanceUnit* maxDistanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
@@ -90,8 +90,8 @@ public:
         return *this;
     }
 
-    builder& withMaxDistance(const unsigned int& maxDistance, const DistanceUnit& maxDistanceUnit) {
-        this->maxDistance = &const_cast<unsigned int&>(maxDistance);
+    builder& withMaxDistance(const float& maxDistance, const DistanceUnit& maxDistanceUnit) {
+        this->maxDistance = &const_cast<float&>(maxDistance);
         this->maxDistanceUnit = &const_cast<DistanceUnit&>(maxDistanceUnit);
         return *this;
     }
