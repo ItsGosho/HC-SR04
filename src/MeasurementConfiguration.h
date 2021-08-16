@@ -2,19 +2,8 @@
 #define HC_SR04_MEASUREMENTCONFIGURATION_H
 
 #include "Arduino.h"
-
-enum class TemperatureUnit {
-    CELSIUS, FAHRENHEIT
-};
-
-enum class DistanceUnit {
-
-    //Metric
-    CENTIMETERS, METERS,
-
-    //Imperial
-    INCH, FEET, YARD
-};
+#include "TemperatureUnits.h"
+#include "DistanceUnits.h"
 
 class MeasurementConfiguration {
 

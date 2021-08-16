@@ -43,10 +43,6 @@ private:
 
     float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
 
-    float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit);
-
-    float convertTemperatureUnit(const float& temperature, const TemperatureUnit& fromUnit, const TemperatureUnit& toUnit);
-
     float calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
 
     void sendTriggerSignal();

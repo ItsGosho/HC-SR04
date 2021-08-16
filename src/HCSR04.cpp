@@ -72,160 +72,8 @@ float HCSR04::convertMetersPerSecondToCentimetersPerMicrosecond(const float& met
  * @return The speed of sound in m/s
  */
 float HCSR04::calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
-    float temperatureInCelsius = this->convertTemperatureUnit(temperature, temperatureUnit, TemperatureUnit::CELSIUS);
+    float temperatureInCelsius = convertTemperatureUnit(temperature, temperatureUnit, TemperatureUnit::CELSIUS);
     return 331.0f + (0.6f * temperatureInCelsius);
-}
-
-float HCSR04::convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit) {
-
-    switch (fromUnit) {
-
-        case DistanceUnit::CENTIMETERS:
-
-            switch (toUnit) {
-
-                case DistanceUnit::CENTIMETERS:
-                    return distance;
-
-                case DistanceUnit::METERS:
-                    return distance / 100.00f;
-
-                case DistanceUnit::INCH:
-                    return distance * 0.393700787f;
-
-                case DistanceUnit::FEET:
-                    return distance * 0.032808399f;
-
-                case DistanceUnit::YARD:
-                    return distance * 0.010936133f;
-            }
-
-            break;
-
-        case DistanceUnit::METERS:
-
-            switch (toUnit) {
-
-                case DistanceUnit::CENTIMETERS:
-                    return distance * 100.00f;
-
-                case DistanceUnit::METERS:
-                    return distance;
-
-                case DistanceUnit::INCH:
-                    return distance * 39.3700787f;
-
-                case DistanceUnit::FEET:
-                    return distance * 3.2808399f;
-
-                case DistanceUnit::YARD:
-                    return distance * 1.0936133f;
-            }
-
-            break;
-
-        case DistanceUnit::INCH:
-
-            switch (toUnit) {
-
-                case DistanceUnit::CENTIMETERS:
-                    return distance * 2.54f;
-
-                case DistanceUnit::METERS:
-                    return distance * 0.0254f;
-
-                case DistanceUnit::INCH:
-                    return distance;
-
-                case DistanceUnit::FEET:
-                    return distance * 0.0833333333f;
-
-                case DistanceUnit::YARD:
-                    return distance * 0.0277777778f;
-            }
-
-            break;
-
-        case DistanceUnit::FEET:
-
-            switch (toUnit) {
-
-                case DistanceUnit::CENTIMETERS:
-                    return distance * 30.48f;
-
-                case DistanceUnit::METERS:
-                    return distance * 0.3048f;
-
-                case DistanceUnit::INCH:
-                    return distance * 12.00f;
-
-                case DistanceUnit::FEET:
-                    return distance;
-
-                case DistanceUnit::YARD:
-                    return distance * 0.333333333f;
-            }
-
-            break;
-
-        case DistanceUnit::YARD:
-
-            switch (toUnit) {
-
-                case DistanceUnit::CENTIMETERS:
-                    return distance * 91.44f;
-
-                case DistanceUnit::METERS:
-                    return distance * 0.9144f;
-
-                case DistanceUnit::INCH:
-                    return distance * 36.00f;
-
-                case DistanceUnit::FEET:
-                    return distance * 3.00f;
-
-                case DistanceUnit::YARD:
-                    return distance;
-            }
-
-            break;
-    }
-
-    return -1;
-}
-
-float HCSR04::convertTemperatureUnit(const float& temperature, const TemperatureUnit& fromUnit, const TemperatureUnit& toUnit) {
-
-    switch (fromUnit) {
-
-        case TemperatureUnit::CELSIUS:
-
-            switch (toUnit) {
-
-                case TemperatureUnit::CELSIUS:
-                    return temperature;
-
-                case TemperatureUnit::FAHRENHEIT:
-                    return temperature * 1.8f + 32;
-            }
-
-            break;
-
-        case TemperatureUnit::FAHRENHEIT:
-
-            switch (toUnit) {
-
-                case TemperatureUnit::CELSIUS:
-                    return (temperature - 32) * 0.5556f;
-
-                case TemperatureUnit::FAHRENHEIT:
-                    return temperature;
-            }
-
-            break;
-    }
-
-    return -1;
 }
 
 void HCSR04::sendTriggerSignal() {
@@ -323,9 +171,9 @@ Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
     }
 
     if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit() && !measurement.isTimedOut) {
-        measurement.isMaxDistanceExceeded = this->convertDistanceUnit(measurement.distance,
-                                                                      measurement.distanceUnit,
-                                                                      *configuration.getMaxDistanceUnit()) > *configuration.getMaxDistance();
+        measurement.isMaxDistanceExceeded = convertDistanceUnit(measurement.distance,
+                                                                measurement.distanceUnit,
+                                                                *configuration.getMaxDistanceUnit()) > *configuration.getMaxDistance();
     }
 
     return measurement;
