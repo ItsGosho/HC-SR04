@@ -235,6 +235,7 @@ void HCSR04::sendTriggerSignal() {
     digitalWrite(this->triggerPin, LOW);
 }
 
+
 Measurement HCSR04::measure() {
 
     this->sendTriggerSignal();
