@@ -33,16 +33,13 @@ bool isButtonPressed() {
 }
 
 void printMeasurement(Measurement measurement) {
-
-    if (measurement.isSignalTimedOut) {
-        Serial.println("Measurement signal timed out!");
-    } else {
-        serial_printf(Serial,
-                      "Distance: %2f %s, Max Distance Exceeded: %o\n",
-                      measurement.distance,
-                      measurement.distanceUnit == DistanceUnit::CENTIMETERS ? "cm" : "m",
-                      measurement.isMaxDistanceExceeded);
-    }
+    serial_printf(Serial,
+                  "Distance: %2f %s, Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i\n",
+                  measurement.getDistance(),
+                  measurement.getDistanceUnit() == DistanceUnit::CENTIMETERS ? "cm" : "m",
+                  measurement.getSignalTimedOutCount(),
+                  measurement.getResponseTimedOutCount(),
+                  measurement.getMaxDistanceExceededCount());
 }
 
 void setup() {
@@ -58,7 +55,7 @@ void loop() {
         Measurement measurement1 = hcsr04.measure(
                 MeasurementConfiguration::builder()
                 .withSamples(5)
-                .withMaxDistance(10,DistanceUnit::CENTIMETERS)
+                //.withMaxDistance(10,DistanceUnit::CENTIMETERS)
                 .build()
                 );
 
@@ -68,7 +65,7 @@ void loop() {
                 MeasurementConfiguration::builder()
                 .withSamples(5)
                 .withTemperature(1, TemperatureUnit::CELSIUS)
-                .withMaxDistance(10,DistanceUnit::CENTIMETERS)
+                //.withMaxDistance(10,DistanceUnit::CENTIMETERS)
                 .build()
                 );
 

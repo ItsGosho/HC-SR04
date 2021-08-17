@@ -99,6 +99,7 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
     /*TODO: Optional.of / else / from*/
+    /*TODO:They can pass in what distance unit they want to receive it*/
     /*TODO: Default values as macros*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
     /*TODO: Added the response timeout us in the configuration*/
@@ -109,7 +110,12 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : DEFAULT_MAX_DISTANCE_CENTIMETERS;
     DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::CENTIMETERS;
 
-    Measurement measurements[samples];
+    float distancesSum = 0;
+    unsigned int validSamples = 0;
+    unsigned int signalTimedOutCount = 0;
+    unsigned int responseTimedOutCount = 0;
+    unsigned int maxDistanceExceededCount = 0;
+
     HCSR04Response hcsr04Responses[samples];
 
     this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutUS);
@@ -125,32 +131,24 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
                                                          DistanceUnit::CENTIMETERS,
                                                          maxDistanceUnit) > maxDistance;
 
-        measurements[i] = Measurement{distanceInCM, DistanceUnit::CENTIMETERS, hcsr04Response.isSignalTimedOut(), hcsr04Response.isResponseTimedOut(), isMaxDistanceExceeded};
+        //NEW Response-a timeoutva ?!
+        //Serial.println(distanceInCM);
+
+        if (!hcsr04Response.isSignalTimedOut() && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
+            distancesSum += distanceInCM;
+            validSamples++;
+        }
+
+        //Note that there is priority
+        if (hcsr04Response.isResponseTimedOut())
+            responseTimedOutCount++;
+        else if (hcsr04Response.isSignalTimedOut())
+            signalTimedOutCount++;
+        else if(isMaxDistanceExceeded)
+            maxDistanceExceededCount++;
     }
 
-    Measurement aggregatedMeasurement{};
-    float distancesSum = 0;
+    float distanceInCMAverage = distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
 
-    for (int i = 0; i < samples; i++) {
-        Measurement measurement = measurements[i];
-
-        /*if (measurement.isMaxDistanceExceeded)
-            aggregatedMeasurement.isMaxDistanceExceeded = true;*/
-
-        /*if (measurement.isResponseTimedOut)
-            aggregatedMeasurement.isResponseTimedOut = true;*/
-
-      /*  if (measurement.isSignalTimedOut)
-            aggregatedMeasurement.isSignalTimedOut = true;*/
-
-        distancesSum += measurement.distance;
-    }
-
-    aggregatedMeasurement.distance = distancesSum / samples;
-
-    aggregatedMeasurement.isMaxDistanceExceeded = convertDistanceUnit(aggregatedMeasurement.distance,
-                                                                      aggregatedMeasurement.distanceUnit,
-                                                                      maxDistanceUnit) > maxDistance;
-
-    return aggregatedMeasurement;
+    return Measurement{distanceInCMAverage, DistanceUnit::CENTIMETERS, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
 }

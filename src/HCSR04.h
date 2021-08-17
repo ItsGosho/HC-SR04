@@ -12,7 +12,7 @@
 #define DEFAULT_RESPONSE_TIMEOUT_US 1000000
 #define DEFAULT_SAMPLES 1
 #define DEFAULT_TEMPERATURE_CELSIUS 25.00f
-#define DEFAULT_MAX_DISTANCE_CENTIMETERS 10.00f
+#define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
 
 /*
  * TODO:
@@ -25,14 +25,51 @@
  *
  * */
 
-struct Measurement {
+/*TODO: Separate class .h and .cpp*/
+class Measurement {
 
+private:
     float distance;
     DistanceUnit distanceUnit;
-    bool isSignalTimedOut;
-    bool isResponseTimedOut;
-    bool isMaxDistanceExceeded;
 
+    unsigned int signalTimedOutCount;
+    unsigned int responseTimedOutCount;
+    unsigned int maxDistanceExceededCount;
+
+public:
+
+    Measurement() {
+        this->distance = 0.00f;
+        this->distanceUnit = DistanceUnit::CENTIMETERS;
+        this->signalTimedOutCount = 0;
+        this->responseTimedOutCount = 0;
+        this->maxDistanceExceededCount = 0;
+    }
+
+    Measurement(float distance, DistanceUnit distanceUnit, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount)
+            : distance(distance), distanceUnit(distanceUnit), signalTimedOutCount(signalTimedOutCount), responseTimedOutCount(
+            responseTimedOutCount), maxDistanceExceededCount(maxDistanceExceededCount) {
+    }
+
+    float getDistance() const {
+        return this->distance;
+    }
+
+    DistanceUnit getDistanceUnit() const {
+        return this->distanceUnit;
+    }
+
+    unsigned int getSignalTimedOutCount() const {
+        return this->signalTimedOutCount;
+    }
+
+    unsigned int getResponseTimedOutCount() const {
+        return this->responseTimedOutCount;
+    }
+
+    unsigned int getMaxDistanceExceededCount() const {
+        return this->maxDistanceExceededCount;
+    }
 };
 
 class HCSR04Response {
@@ -59,7 +96,7 @@ public:
     }
 
     bool isResponseTimedOut() const {
-        return this->mHighSignalLengthUS;
+        return this->mIsResponseTimedOut;
     }
 
     bool isSignalTimedOut() const {
