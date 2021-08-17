@@ -150,5 +150,5 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
 
     float distanceInCMAverage = distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
 
-    return Measurement{distanceInCMAverage, DistanceUnit::CENTIMETERS, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
+    return Measurement{distanceInCMAverage, DistanceUnit::CENTIMETERS, samples, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
 }

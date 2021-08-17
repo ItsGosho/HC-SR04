@@ -32,6 +32,8 @@ private:
     float distance;
     DistanceUnit distanceUnit;
 
+    unsigned int takenSamples;
+
     unsigned int signalTimedOutCount;
     unsigned int responseTimedOutCount;
     unsigned int maxDistanceExceededCount;
@@ -46,9 +48,10 @@ public:
         this->maxDistanceExceededCount = 0;
     }
 
-    Measurement(float distance, DistanceUnit distanceUnit, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount)
-            : distance(distance), distanceUnit(distanceUnit), signalTimedOutCount(signalTimedOutCount), responseTimedOutCount(
-            responseTimedOutCount), maxDistanceExceededCount(maxDistanceExceededCount) {
+    Measurement(float distance, DistanceUnit distanceUnit, unsigned int takenSamples, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount)
+            : distance(distance), distanceUnit(distanceUnit), takenSamples(takenSamples), signalTimedOutCount(
+            signalTimedOutCount), responseTimedOutCount(responseTimedOutCount), maxDistanceExceededCount(
+            maxDistanceExceededCount) {
     }
 
     float getDistance() const {
@@ -57,6 +60,10 @@ public:
 
     DistanceUnit getDistanceUnit() const {
         return this->distanceUnit;
+    }
+
+    unsigned int getTakenSamples() const {
+        return this->takenSamples;
     }
 
     unsigned int getSignalTimedOutCount() const {
@@ -69,6 +76,14 @@ public:
 
     unsigned int getMaxDistanceExceededCount() const {
         return this->maxDistanceExceededCount;
+    }
+
+    unsigned long getInvalidMeasurementsCount() {
+        return this->getSignalTimedOutCount() + this->getResponseTimedOutCount() + this->getMaxDistanceExceededCount();
+    }
+
+    unsigned long getValidMeasurementsCount() {
+        return this->takenSamples - this->getInvalidMeasurementsCount();
     }
 };
 

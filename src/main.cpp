@@ -34,9 +34,11 @@ bool isButtonPressed() {
 
 void printMeasurement(Measurement measurement) {
     serial_printf(Serial,
-                  "Distance: %2f %s, Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i\n",
+                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
                   measurement.getDistance(),
                   measurement.getDistanceUnit() == DistanceUnit::CENTIMETERS ? "cm" : "m",
+                  measurement.getValidMeasurementsCount(),
+                  measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
                   measurement.getMaxDistanceExceededCount());
@@ -55,7 +57,7 @@ void loop() {
         Measurement measurement1 = hcsr04.measure(
                 MeasurementConfiguration::builder()
                 .withSamples(5)
-                //.withMaxDistance(10,DistanceUnit::CENTIMETERS)
+                .withMaxDistance(10,DistanceUnit::CENTIMETERS)
                 .build()
                 );
 
