@@ -76,7 +76,7 @@ float HCSR04::calculateSoundSpeedByTemperature(const float& temperature, const T
     return 331.0f + (0.6f * temperatureInCelsius);
 }
 
-void HCSR04::sendTriggerSignal() {
+void HCSR04::sendTriggerSignalToHCSR04() {
 
     digitalWrite(this->triggerPin, HIGH);
     delayMicroseconds(TRIGGER_SIGNAL_LENGTH_US);
@@ -85,7 +85,7 @@ void HCSR04::sendTriggerSignal() {
 
 unsigned long HCSR04::sendAndReceivedToHCSR04() {
 
-    this->sendTriggerSignal();
+    this->sendTriggerSignalToHCSR04();
     unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
 
     delay(COOL_DOWN_DELAY_MS);

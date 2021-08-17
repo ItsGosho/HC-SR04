@@ -45,7 +45,7 @@ private:
 
     float calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
 
-    void sendTriggerSignal();
+    void sendTriggerSignalToHCSR04();
 
 public:
 
