@@ -99,8 +99,10 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
     /*TODO: Optional.of / else / from*/
+    /*TODO: Default values as macros*/
+    /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
     /*TODO: Added the response timeout us in the configuration*/
-    unsigned long responseTimeOutUS = 1000000;
+    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS() ? *measurementConfiguration.getResponseTimeoutUS() : 1000000;
     unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : 1;
     float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : 25.00f;
     TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit() ? *measurementConfiguration.getTemperatureUnit() : TemperatureUnit::CELSIUS;
@@ -128,7 +130,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     Measurement aggregatedMeasurement{};
     float distancesSum = 0;
 
-    for (int i = 0; i < samples; ++i) {
+    for (int i = 0; i < samples; i++) {
         Measurement measurement = measurements[i];
 
         if (measurement.isMaxDistanceExceeded)

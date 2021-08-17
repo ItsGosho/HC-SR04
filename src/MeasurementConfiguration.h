@@ -14,12 +14,13 @@ private:
     DistanceUnit* maxDistanceUnit;
     float* temperature;
     TemperatureUnit* temperatureUnit;
+    unsigned long* responseTimeoutUS;
 
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature, TemperatureUnit* temperatureUnit)
-            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(temperatureUnit) {
+    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS)
+            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(temperatureUnit), responseTimeoutUS(responseTimeoutUS) {
     }
 
     unsigned int* getSamples() const {
@@ -42,6 +43,10 @@ public:
         return this->temperatureUnit;
     }
 
+    unsigned long* getResponseTimeoutUS() const {
+        return responseTimeoutUS;
+    }
+
 };
 
 class MeasurementConfiguration::builder {
@@ -52,6 +57,7 @@ private:
     DistanceUnit* mMaxDistanceUnit;
     float* mTemperature;
     TemperatureUnit* mTemperatureUnit;
+    unsigned long* mResponseTimeoutUS;
 
 public:
     builder() {
@@ -60,6 +66,7 @@ public:
         this->mMaxDistanceUnit = nullptr;
         this->mTemperature = nullptr;
         this->mTemperatureUnit = nullptr;
+        this->mResponseTimeoutUS = nullptr;
     }
 
     builder& withSamples(const unsigned int& samples) {
@@ -79,13 +86,19 @@ public:
         return *this;
     }
 
+    builder& withResponseTimeoutUS(const unsigned long& responseTimeoutUS) {
+        this->mResponseTimeoutUS = &const_cast<unsigned long&>(responseTimeoutUS);
+        return *this;
+    }
+
     MeasurementConfiguration build() const {
 
         return MeasurementConfiguration(this->mSamples,
                                         this->mMaxDistance,
                                         this->mMaxDistanceUnit,
                                         this->mTemperature,
-                                        this->mTemperatureUnit);
+                                        this->mTemperatureUnit,
+                                        this->mResponseTimeoutUS);
     }
 
 };
