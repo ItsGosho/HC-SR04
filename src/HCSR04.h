@@ -15,13 +15,7 @@
 #define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
 
 /*
- * TODO:
- * Multiple samples : DONE
- * Timeouts
- * Temperature hookup generic way (maybe just passer of temperature to be passed in given degree)
- * Max distance, which can be present and returned in the object if exceed, but the timed out must be more specific in the variable name
- * ONE WIRE MODE
- * Option in the configuration to exlude/include in multiple samples timeouts
+ * TODO: ONE WIRE MODE
  *
  * */
 

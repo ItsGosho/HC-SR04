@@ -1,5 +1,6 @@
 #include "DistanceUnits.h"
 
+/*TODO: Refactor*/
 float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit) {
 
     switch (fromUnit) {

@@ -72,7 +72,6 @@ HCSR04Response HCSR04::sendAndReceivedToHCSR04() {
     return {responseSignalLength, false};
 }
 
-/*TODO: Dont forget if comparing the signal length that it is in US!*/
 HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS) {
 
     this->sendTriggerSignalToHCSR04();
@@ -100,9 +99,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
 
     /*TODO: Optional.of / else / from*/
     /*TODO:They can pass in what distance unit they want to receive it*/
-    /*TODO: Default values as macros*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
-    /*TODO: Added the response timeout us in the configuration*/
     unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS() ? *measurementConfiguration.getResponseTimeoutUS() : DEFAULT_RESPONSE_TIMEOUT_US;
     unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : DEFAULT_SAMPLES;
     float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : DEFAULT_TEMPERATURE_CELSIUS;

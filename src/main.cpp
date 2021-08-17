@@ -54,16 +54,7 @@ void loop() {
 
     if (isButtonPressed()) {
 
-        Measurement measurement1 = hcsr04.measure(
-                MeasurementConfiguration::builder()
-                .withSamples(5)
-                .withMaxDistance(10,DistanceUnit::CENTIMETERS)
-                .build()
-                );
-
-        printMeasurement(measurement1);
-
-        Measurement measurement2 = hcsr04.measure(
+        Measurement measurement = hcsr04.measure(
                 MeasurementConfiguration::builder()
                 .withSamples(5)
                 .withTemperature(1, TemperatureUnit::CELSIUS)
@@ -71,7 +62,7 @@ void loop() {
                 .build()
                 );
 
-        printMeasurement(measurement2);
+        printMeasurement(measurement);
 
         Serial.println("----------------------------------");
     }
