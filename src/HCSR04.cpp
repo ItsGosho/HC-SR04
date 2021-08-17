@@ -106,8 +106,8 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : DEFAULT_SAMPLES;
     float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : DEFAULT_TEMPERATURE_CELSIUS;
     TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit() ? *measurementConfiguration.getTemperatureUnit() : TemperatureUnit::CELSIUS;
-    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : DEFAULT_MAX_DISTANCE_METERS;
-    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::METERS;
+    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : DEFAULT_MAX_DISTANCE_CENTIMETERS;
+    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::CENTIMETERS;
 
     Measurement measurements[samples];
     HCSR04Response hcsr04Responses[samples];
@@ -120,6 +120,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
         float soundSpeed = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
         float distanceInCM = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
                                                                                 soundSpeed);
+
         bool isMaxDistanceExceeded = convertDistanceUnit(distanceInCM,
                                                          DistanceUnit::CENTIMETERS,
                                                          maxDistanceUnit) > maxDistance;
@@ -133,19 +134,22 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     for (int i = 0; i < samples; i++) {
         Measurement measurement = measurements[i];
 
-        if (measurement.isMaxDistanceExceeded)
-            aggregatedMeasurement.isMaxDistanceExceeded = true;
+        /*if (measurement.isMaxDistanceExceeded)
+            aggregatedMeasurement.isMaxDistanceExceeded = true;*/
 
-        if (measurement.isResponseTimedOut)
-            aggregatedMeasurement.isResponseTimedOut = true;
+        /*if (measurement.isResponseTimedOut)
+            aggregatedMeasurement.isResponseTimedOut = true;*/
 
-        if (measurement.isSignalTimedOut)
-            aggregatedMeasurement.isSignalTimedOut = true;
+      /*  if (measurement.isSignalTimedOut)
+            aggregatedMeasurement.isSignalTimedOut = true;*/
 
         distancesSum += measurement.distance;
     }
 
     aggregatedMeasurement.distance = distancesSum / samples;
+    aggregatedMeasurement.isMaxDistanceExceeded = convertDistanceUnit(aggregatedMeasurement.distance,
+                                                                      aggregatedMeasurement.distanceUnit,
+                                                                      maxDistanceUnit) > maxDistance;
 
     return aggregatedMeasurement;
 }
