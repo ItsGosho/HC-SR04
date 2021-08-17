@@ -147,6 +147,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     }
 
     aggregatedMeasurement.distance = distancesSum / samples;
+
     aggregatedMeasurement.isMaxDistanceExceeded = convertDistanceUnit(aggregatedMeasurement.distance,
                                                                       aggregatedMeasurement.distanceUnit,
                                                                       maxDistanceUnit) > maxDistance;
