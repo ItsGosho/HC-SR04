@@ -24,7 +24,8 @@ struct Measurement {
 
     float distance;
     DistanceUnit distanceUnit;
-    bool isTimedOut;
+    bool isSignalTimedOut;
+    bool isResponseTimedOut;
     bool isMaxDistanceExceeded;
 
 };
@@ -38,11 +39,17 @@ private:
 
 public:
 
+    HCSR04Response() {
+        this->mHighSignalLengthUS = 0;
+        this->mIsResponseTimedOut = false;
+        this->mIsSignalTimedOut = false;
+    }
+
     HCSR04Response(unsigned long mHighSignalLengthUs, bool mIsResponseTimedOut) : mHighSignalLengthUS(
             mHighSignalLengthUs), mIsResponseTimedOut(mIsResponseTimedOut) {
     }
 
-    unsigned long getHighSignalLengthUs() const {
+    unsigned long getHighSignalLengthUS() const {
         return this->mHighSignalLengthUS;
     }
 
@@ -76,15 +83,15 @@ public:
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
 
-    Measurement measure();
-
-    Measurement HCSR04::measureWithTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
-
-    Measurement measureWithSamples(const unsigned int& samples);
-
-    Measurement HCSR04::measureWithSamplesAndTemperature(const unsigned int& samples, const float& temperature, const TemperatureUnit& temperatureUnit);
-
     Measurement measure(const MeasurementConfiguration& configuration);
+
+    HCSR04Response sendAndReceivedToHCSR04();
+
+    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times);
+
+    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS);
+
+    HCSR04Response sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS);
 };
 
 

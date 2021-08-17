@@ -9,7 +9,7 @@
  * @param timeoutUS The max time that the state has to be the given one
  * @return If there was a timeout.
  */
-bool waitStateNot(const unsigned int digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
+bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
 
     unsigned long start = micros();
 
@@ -31,7 +31,7 @@ bool waitStateNot(const unsigned int digitalPin, const char& expectedState, cons
  * @param timeoutUS The max time that the state has to be the given one
  * @return If there was a timeout.
  */
-bool waitStateIs(const unsigned int digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
+bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
 
     unsigned long start = micros();
 

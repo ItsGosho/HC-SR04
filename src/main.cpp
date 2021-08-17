@@ -34,8 +34,8 @@ bool isButtonPressed() {
 
 void printMeasurement(Measurement measurement) {
 
-    if (measurement.isTimedOut) {
-        Serial.println("Measurement timed out!");
+    if (measurement.isSignalTimedOut) {
+        Serial.println("Measurement signal timed out!");
     } else {
         serial_printf(Serial,
                       "Distance: %2f %s, Max Distance Exceeded: %o\n",

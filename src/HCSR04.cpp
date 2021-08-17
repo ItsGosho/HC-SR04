@@ -73,107 +73,77 @@ HCSR04Response HCSR04::sendAndReceivedToHCSR04() {
 }
 
 /*TODO: Dont forget if comparing the signal length that it is in US!*/
-HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned int& responseTimeOutMS) {
+HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS) {
 
     this->sendTriggerSignalToHCSR04();
-    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
+    SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(this->echoPin, HIGH, responseTimeOutUS);
 
     delay(COOL_DOWN_DELAY_MS);
-    return {responseSignalLength, false};
+    return {signalLengthMeasurementUs.signalLengthUS, signalLengthMeasurementUs.isTimedOut};
 }
 
-/*TODO Defined and declared up, because of the template.*/
-template<size_t S>
-void HCSR04::sendAndReceivedToHCSR04(HCSR04Response (& hcsr04Responses)[S], const unsigned int& times) {
 
-    for (int i = 0; i < times; ++i)
+void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times) {
+
+    for (int i = 0; i < times; i++)
         hcsr04Responses[i] = this->sendAndReceivedToHCSR04();
 }
 
-Measurement HCSR04::measure() {
 
-    HCSR04Response hcsr04Response = this->sendAndReceivedToHCSR04();
+void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS) {
 
-    if (hcsr04Response.is)
-        return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
-
-    return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false};
+    for (int i = 0; i < times; i++)
+        hcsr04Responses[i] = this->sendAndReceivedToHCSR04(responseTimeOutUS);
 }
 
-Measurement HCSR04::measureWithTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
+Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
-    unsigned long responseSignalLength = this->sendAndReceivedToHCSR04();
+    /*TODO: Optional.of / else / from*/
+    /*TODO: Added the response timeout us in the configuration*/
+    unsigned long responseTimeOutUS = 1000000;
+    unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : 1;
+    float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : 25.00f;
+    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit() ? *measurementConfiguration.getTemperatureUnit() : TemperatureUnit::CELSIUS;
+    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : 4.00f;
+    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::METERS;
 
-    if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
-        return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
+    Measurement measurements[samples];
+    HCSR04Response hcsr04Responses[samples];
 
-    float soundSpeed = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
-    float distanceInCM = this->calculateDistanceBySignalLengthAndSoundSpeed(responseSignalLength, soundSpeed);
-
-    return Measurement{distanceInCM, DistanceUnit::CENTIMETERS, false, false};
-}
-
-
-Measurement HCSR04::measureWithSamples(const unsigned int& samples) {
-
-    float total = 0;
+    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutUS);
 
     for (int i = 0; i < samples; i++) {
-        Measurement measurement = this->measure();
+        HCSR04Response hcsr04Response = hcsr04Responses[i];
 
-        if (measurement.isTimedOut)
-            return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
+        float soundSpeed = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
+        float distanceInCM = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
+                                                                                soundSpeed);
+        bool isMaxDistanceExceeded = convertDistanceUnit(distanceInCM,
+                                                         DistanceUnit::CENTIMETERS,
+                                                         maxDistanceUnit) > maxDistance;
 
-        total += measurement.distance;
+        measurements[i] = Measurement{distanceInCM, DistanceUnit::CENTIMETERS, hcsr04Response.isSignalTimedOut(), hcsr04Response.isResponseTimedOut(), isMaxDistanceExceeded};
     }
 
-    float averageDistanceInCentimeters = total / static_cast<float>(samples);
-    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false};
+    Measurement aggregatedMeasurement{};
+    float distancesSum = 0;
+
+    for (int i = 0; i < samples; ++i) {
+        Measurement measurement = measurements[i];
+
+        if (measurement.isMaxDistanceExceeded)
+            aggregatedMeasurement.isMaxDistanceExceeded = true;
+
+        if (measurement.isResponseTimedOut)
+            aggregatedMeasurement.isResponseTimedOut = true;
+
+        if (measurement.isSignalTimedOut)
+            aggregatedMeasurement.isSignalTimedOut = true;
+
+        distancesSum += measurement.distance;
+    }
+
+    aggregatedMeasurement.distance = distancesSum / samples;
+
+    return aggregatedMeasurement;
 }
-
-Measurement HCSR04::measureWithSamplesAndTemperature(const unsigned int& samples, const float& temperature, const TemperatureUnit& temperatureUnit) {
-
-    float total = 0;
-
-    for (int i = 0; i < samples; i++) {
-        Measurement measurement = this->measureWithTemperature(temperature, temperatureUnit);
-
-        if (measurement.isTimedOut)
-            return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
-
-        total += measurement.distance;
-    }
-
-    float averageDistanceInCentimeters = total / static_cast<float>(samples);
-    return Measurement{averageDistanceInCentimeters, DistanceUnit::CENTIMETERS, false, false};
-}
-
-Measurement HCSR04::measure(const MeasurementConfiguration& configuration) {
-
-    Measurement measurement{};
-
-    bool isMeasureWithTemperature = configuration.getTemperature() && configuration.getTemperatureUnit();
-    bool isMeasureWithSamples = configuration.getSamples();
-
-    if (isMeasureWithSamples && isMeasureWithTemperature) {
-        measurement = this->measureWithSamplesAndTemperature(*configuration.getSamples(),
-                                                             *configuration.getTemperature(),
-                                                             *configuration.getTemperatureUnit());
-
-    } else if (isMeasureWithTemperature) {
-        measurement = this->measureWithTemperature(*configuration.getTemperature(),
-                                                   *configuration.getTemperatureUnit());
-
-    } else if (isMeasureWithSamples) {
-        measurement = this->measureWithSamples(*configuration.getSamples());
-    }
-
-    if (configuration.getMaxDistance() && configuration.getMaxDistanceUnit() && !measurement.isTimedOut) {
-        measurement.isMaxDistanceExceeded = convertDistanceUnit(measurement.distance,
-                                                                measurement.distanceUnit,
-                                                                *configuration.getMaxDistanceUnit()) > *configuration.getMaxDistance();
-    }
-
-    return measurement;
-}
-

@@ -5,14 +5,15 @@
 
 struct SignalLengthMeasurementUS {
 
-    unsigned long mSignalLengthUS;
+    unsigned long signalLengthUS;
     bool isTimedOut;
 };
 
-bool wait
+bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS);
+bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS);
 
 unsigned long measureSignalLength(const uint8_t& pin, const int& mode);
 
-SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const int& mode, const unsigned long& timeoutUS);
+SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const char& mode, const unsigned long& timeoutUS);
 
 #endif //HC_SR04_UTILS_H
