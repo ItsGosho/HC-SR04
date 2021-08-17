@@ -6,26 +6,6 @@ HCSR04::HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin) : triggerPin(t
 }
 
 /**
- * Will measure the length of a given signal.
- * If the current signal is not the given one, then it will block until it is.
- * If the current signal is the given one, then it will measure it directly.
- *
- * @param pin The digital pin, which will be used to determinate the signal
- * @param mode HIGH or LOW
- * @return The length of the given signal
- */
-unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode) {
-
-    while (digitalRead(pin) != mode);
-
-    unsigned long start = micros();
-
-    while (digitalRead(pin) == mode);
-
-    return micros() - start;
-}
-
-/**
  * Will convert the signal length to the actual distance in cm.
  * The signal length represents the time the signal travelled per cm/us.
  * Note that here we assume the sound speed is 340.
@@ -83,20 +63,38 @@ void HCSR04::sendTriggerSignalToHCSR04() {
     digitalWrite(this->triggerPin, LOW);
 }
 
-unsigned long HCSR04::sendAndReceivedToHCSR04() {
+HCSR04Response HCSR04::sendAndReceivedToHCSR04() {
 
     this->sendTriggerSignalToHCSR04();
     unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
 
     delay(COOL_DOWN_DELAY_MS);
-    return responseSignalLength;
+    return {responseSignalLength, false};
+}
+
+/*TODO: Dont forget if comparing the signal length that it is in US!*/
+HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned int& responseTimeOutMS) {
+
+    this->sendTriggerSignalToHCSR04();
+    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
+
+    delay(COOL_DOWN_DELAY_MS);
+    return {responseSignalLength, false};
+}
+
+/*TODO Defined and declared up, because of the template.*/
+template<size_t S>
+void HCSR04::sendAndReceivedToHCSR04(HCSR04Response (& hcsr04Responses)[S], const unsigned int& times) {
+
+    for (int i = 0; i < times; ++i)
+        hcsr04Responses[i] = this->sendAndReceivedToHCSR04();
 }
 
 Measurement HCSR04::measure() {
 
-    unsigned long responseSignalLength = this->sendAndReceivedToHCSR04();
+    HCSR04Response hcsr04Response = this->sendAndReceivedToHCSR04();
 
-    if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
+    if (hcsr04Response.is)
         return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
 
     return Measurement{this->calculateDistanceBySignalLength(responseSignalLength), DistanceUnit::CENTIMETERS, false, false};

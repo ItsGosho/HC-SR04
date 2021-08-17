@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <MeasurementConfiguration.h>
+#include <Utils.h>
 
 #define TRIGGER_SIGNAL_LENGTH_US 10
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
@@ -28,14 +29,38 @@ struct Measurement {
 
 };
 
+class HCSR04Response {
+
+private:
+    unsigned long mHighSignalLengthUS;
+    bool mIsResponseTimedOut;
+    bool mIsSignalTimedOut;
+
+public:
+
+    HCSR04Response(unsigned long mHighSignalLengthUs, bool mIsResponseTimedOut) : mHighSignalLengthUS(
+            mHighSignalLengthUs), mIsResponseTimedOut(mIsResponseTimedOut) {
+    }
+
+    unsigned long getHighSignalLengthUs() const {
+        return this->mHighSignalLengthUS;
+    }
+
+    bool isResponseTimedOut() const {
+        return this->mHighSignalLengthUS;
+    }
+
+    bool isSignalTimedOut() const {
+        return this->mHighSignalLengthUS >= TIMEOUT_SIGNAL_LENGTH_US;
+    }
+};
+
 class HCSR04 {
 
 private:
 
     uint8_t triggerPin;
     uint8_t echoPin;
-
-    unsigned long HCSR04::measureSignalLength(const uint8_t& pin, const int& mode);
 
     float calculateDistanceBySignalLength(const unsigned int& signalLength);
 
