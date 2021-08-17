@@ -83,14 +83,18 @@ void HCSR04::sendTriggerSignal() {
     digitalWrite(this->triggerPin, LOW);
 }
 
-
-Measurement HCSR04::measure() {
+unsigned long HCSR04::sendAndReceivedToHCSR04() {
 
     this->sendTriggerSignal();
-
     unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
 
     delay(COOL_DOWN_DELAY_MS);
+    return responseSignalLength;
+}
+
+Measurement HCSR04::measure() {
+
+    unsigned long responseSignalLength = this->sendAndReceivedToHCSR04();
 
     if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
@@ -100,11 +104,7 @@ Measurement HCSR04::measure() {
 
 Measurement HCSR04::measureWithTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
 
-    this->sendTriggerSignal();
-
-    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
-
-    delay(COOL_DOWN_DELAY_MS);
+    unsigned long responseSignalLength = this->sendAndReceivedToHCSR04();
 
     if (responseSignalLength >= TIMEOUT_SIGNAL_LENGTH_US)
         return Measurement{0, DistanceUnit::CENTIMETERS, true, false};
