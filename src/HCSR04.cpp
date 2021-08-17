@@ -102,11 +102,11 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     /*TODO: Default values as macros*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
     /*TODO: Added the response timeout us in the configuration*/
-    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS() ? *measurementConfiguration.getResponseTimeoutUS() : 1000000;
-    unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : 1;
-    float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : 25.00f;
+    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS() ? *measurementConfiguration.getResponseTimeoutUS() : DEFAULT_RESPONSE_TIMEOUT_US;
+    unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : DEFAULT_SAMPLES;
+    float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : DEFAULT_TEMPERATURE_CELSIUS;
     TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit() ? *measurementConfiguration.getTemperatureUnit() : TemperatureUnit::CELSIUS;
-    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : 4.00f;
+    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : DEFAULT_MAX_DISTANCE_METERS;
     DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::METERS;
 
     Measurement measurements[samples];
