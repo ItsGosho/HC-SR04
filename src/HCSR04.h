@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "Measurement.h"
 #include "HCSR04Response.h"
+#include "HCSR04ResponseErrors.h"
 
 #define TRIGGER_SIGNAL_LENGTH_US 10
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
@@ -85,6 +86,18 @@ public:
     void setDefaultResponseTimeoutUs(const unsigned long& defaultResponseTimeoutUs);
 
     void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
+
+    bool isMaxDistanceExceeded(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration);
+
+    bool isResponseValid(const MeasurementConfiguration& measurementConfiguration, const HCSR04Response& hcsr04Response);
+
+    HCSR04ResponseErrors HCSR04::countResponseErrors(HCSR04Response hcsr04Responses[], const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration);
+
+    float calculateDistance(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration);
+
+    float calculateAverage(HCSR04Response* hcsr04Responses, const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration);
+
+    void sendAndReceivedToHCSR04(HCSR04Response* hcsr04Responses, const MeasurementConfiguration& measurementConfiguration);
 };
 
 

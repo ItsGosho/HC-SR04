@@ -75,6 +75,18 @@ float HCSR04::calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& s
     return convertDistanceUnit(distanceInCM, DistanceUnit::CENTIMETERS, distanceUnit);
 }
 
+/*TODO: Doc*/
+float HCSR04::calculateDistance(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration) {
+
+    float temperatureValue = measurementConfiguration.getTemperatureValue().orElseGet(this->defaultTemperatureValue);
+    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(this->defaultTemperatureUnit);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);;
+
+    float soundSpeedMetersPerSecond = this->calculateSoundSpeedByTemperature(temperatureValue, temperatureUnit);
+
+    return this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(), soundSpeedMetersPerSecond, measurementDistanceUnit);
+}
+
 /**
  * Will convert meters per second to centimeters per microsecond/
  *
@@ -140,45 +152,49 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
         hcsr04Responses[i] = this->sendAndReceivedToHCSR04(responseTimeOutUS);
 }
 
-Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
+void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const MeasurementConfiguration& measurementConfiguration) {
 
     unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(this->defaultResponseTimeoutUS);
     unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
-    float temperatureValue = measurementConfiguration.getTemperatureValue().orElseGet(this->defaultTemperatureValue);
-    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(this->defaultTemperatureUnit);
+
+    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutUS);
+}
+
+bool HCSR04::isResponseValid(const MeasurementConfiguration& measurementConfiguration, const HCSR04Response& hcsr04Response) {
+
     float maxDistanceValue = measurementConfiguration.getMaxDistanceValue().orElseGet(this->defaultMaxDistanceValue);
     DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(this->defaultMaxDistanceUnit);
-    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);;
 
-    float distancesSum = 0;
-    unsigned int validSamples = 0;
+    float distance = this->calculateDistance(hcsr04Response, measurementConfiguration);
+
+    bool isMaxDistanceExceeded = convertDistanceUnit(distance, measurementDistanceUnit, maxDistanceUnit) > maxDistanceValue;
+
+    return !hcsr04Response.isSignalTimedOut(TIMEOUT_SIGNAL_LENGTH_US) && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded;
+}
+
+bool HCSR04::isMaxDistanceExceeded(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration) {
+
+    float maxDistanceValue = measurementConfiguration.getMaxDistanceValue().orElseGet(this->defaultMaxDistanceValue);
+    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(this->defaultMaxDistanceUnit);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);;
+
+    float distance = this->calculateDistance(hcsr04Response, measurementConfiguration);
+
+    return convertDistanceUnit(distance, measurementDistanceUnit, maxDistanceUnit) > maxDistanceValue;;
+}
+
+HCSR04ResponseErrors HCSR04::countResponseErrors(HCSR04Response hcsr04Responses[], const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration) {
+
     unsigned int signalTimedOutCount = 0;
     unsigned int responseTimedOutCount = 0;
     unsigned int maxDistanceExceededCount = 0;
 
-    HCSR04Response hcsr04Responses[samples];
-
-    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutUS);
-
-    for (int i = 0; i < samples; i++) {
+    for (int i = 0; i < responsesCount; ++i) {
         HCSR04Response hcsr04Response = hcsr04Responses[i];
 
-        float soundSpeedMetersPerSecond = this->calculateSoundSpeedByTemperature(temperatureValue, temperatureUnit);
+        bool isMaxDistanceExceeded = this->isMaxDistanceExceeded(hcsr04Response, measurementConfiguration);
 
-        float distance = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
-                                                                            soundSpeedMetersPerSecond,
-                                                                            measurementDistanceUnit);
-
-        bool isMaxDistanceExceeded = convertDistanceUnit(distance,
-                                                         measurementDistanceUnit,
-                                                         maxDistanceUnit) > maxDistanceValue;
-
-        if (!hcsr04Response.isSignalTimedOut(TIMEOUT_SIGNAL_LENGTH_US) && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
-            distancesSum += distance;
-            validSamples++;
-        }
-
-        //Note that there is priority
         if (hcsr04Response.isResponseTimedOut())
             responseTimedOutCount++;
         else if (hcsr04Response.isSignalTimedOut(TIMEOUT_SIGNAL_LENGTH_US))
@@ -187,9 +203,41 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
             maxDistanceExceededCount++;
     }
 
-    float distanceInCMAverage = distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
+    return {signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};
+}
 
-    return Measurement{distanceInCMAverage, measurementDistanceUnit, samples, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
+float HCSR04::calculateAverage(HCSR04Response hcsr04Responses[], const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration) {
+
+    float distancesSum = 0;
+    unsigned int validSamples = 0;
+
+    for (int i = 0; i < responsesCount; i++) {
+        HCSR04Response hcsr04Response = hcsr04Responses[i];
+
+        float distance = this->calculateDistance(hcsr04Response, measurementConfiguration);
+
+        if (this->isResponseValid(measurementConfiguration, hcsr04Response)) {
+            distancesSum += distance;
+            validSamples++;
+        }
+    }
+
+    return distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
+}
+
+Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
+
+    unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);;
+
+    HCSR04Response hcsr04Responses[samples];
+
+    this->sendAndReceivedToHCSR04(hcsr04Responses, measurementConfiguration);
+
+    HCSR04ResponseErrors hcsr04ResponseErrors = this->countResponseErrors(hcsr04Responses, samples, measurementConfiguration);
+    float averageDistance = this->calculateAverage(hcsr04Responses, samples, measurementConfiguration);
+
+    return Measurement{averageDistance, measurementDistanceUnit, samples, hcsr04ResponseErrors.signalTimedOutCount, hcsr04ResponseErrors.responseTimedOutCount, hcsr04ResponseErrors.maxDistanceExceededCount};;
 }
 
 void HCSR04::setDefaultSamples(const unsigned int& defaultSamples) {
