@@ -100,12 +100,13 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     /*TODO: Optional.of / else / from*/
     /*TODO:They can pass in what distance unit they want to receive it*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
-    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS() ? *measurementConfiguration.getResponseTimeoutUS() : DEFAULT_RESPONSE_TIMEOUT_US;
-    unsigned int samples = measurementConfiguration.getSamples() ? *measurementConfiguration.getSamples() : DEFAULT_SAMPLES;
-    float temperature = measurementConfiguration.getTemperature() ? *measurementConfiguration.getTemperature() : DEFAULT_TEMPERATURE_CELSIUS;
-    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit() ? *measurementConfiguration.getTemperatureUnit() : TemperatureUnit::CELSIUS;
-    float maxDistance = measurementConfiguration.getMaxDistance() ? *measurementConfiguration.getMaxDistance() : DEFAULT_MAX_DISTANCE_CENTIMETERS;
-    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit() ? *measurementConfiguration.getMaxDistanceUnit() : DistanceUnit::CENTIMETERS;
+
+    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(DEFAULT_RESPONSE_TIMEOUT_US);
+    unsigned int samples = measurementConfiguration.getSamples().orElseGet(DEFAULT_SAMPLES);
+    float temperature = measurementConfiguration.getTemperature().orElseGet(DEFAULT_TEMPERATURE_CELSIUS);
+    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(TemperatureUnit::CELSIUS);
+    float maxDistance = measurementConfiguration.getMaxDistance().orElseGet(DEFAULT_MAX_DISTANCE_CENTIMETERS);
+    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(DistanceUnit::CENTIMETERS);
 
     float distancesSum = 0;
     unsigned int validSamples = 0;

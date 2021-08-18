@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "TemperatureUnits.h"
 #include "DistanceUnits.h"
+#include "Optional.h"
 
 class MeasurementConfiguration {
 
@@ -23,28 +24,28 @@ public:
             : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(temperatureUnit), responseTimeoutUS(responseTimeoutUS) {
     }
 
-    unsigned int* getSamples() const {
-        return this->samples;
+    Optional<unsigned int> getSamples() const {
+        return {this->samples};
     }
 
-    float* getMaxDistance() const {
-        return this->maxDistance;
+    Optional<float> getMaxDistance() const {
+        return {this->maxDistance};
     }
 
-    DistanceUnit* getMaxDistanceUnit() const {
-        return this->maxDistanceUnit;
+    Optional<DistanceUnit> getMaxDistanceUnit() const {
+        return {this->maxDistanceUnit};
     }
 
-    float* getTemperature() const {
-        return this->temperature;
+    Optional<float> getTemperature() const {
+        return {this->temperature};
     }
 
-    TemperatureUnit* getTemperatureUnit() const {
-        return this->temperatureUnit;
+    Optional<TemperatureUnit> getTemperatureUnit() const {
+        return {this->temperatureUnit};
     }
 
-    unsigned long* getResponseTimeoutUS() const {
-        return responseTimeoutUS;
+    Optional<unsigned long> getResponseTimeoutUS() const {
+        return {this->responseTimeoutUS};
     }
 
 };
