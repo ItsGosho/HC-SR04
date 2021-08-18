@@ -11,10 +11,15 @@ enum class DistanceUnit {
 };
 
 float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, const DistanceUnit& toUnit);
+
 float convertCentimetersTo(const float& centimeters, const DistanceUnit& toUnit);
+
 float convertMetersTo(const float& meters, const DistanceUnit& toUnit);
+
 float convertInchesTo(const float& inches, const DistanceUnit& toUnit);
+
 float convertFootTo(const float& foot, const DistanceUnit& toUnit);
+
 float convertYardsTo(const float& yards, const DistanceUnit& toUnit);
 
 
