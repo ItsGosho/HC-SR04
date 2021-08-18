@@ -10,6 +10,7 @@ struct SignalLengthMeasurementUS {
 };
 
 bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS);
+
 bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS);
 
 unsigned long measureSignalLength(const uint8_t& pin, const int& mode);

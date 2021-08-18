@@ -10,6 +10,7 @@
 HCSR04 hcsr04(HCSR04_ONE_WIRE_PIN);
 
 void printMeasurement(Measurement measurement);
+
 const char* getDistanceUnitName(const DistanceUnit& distanceUnit);
 
 void setup() {

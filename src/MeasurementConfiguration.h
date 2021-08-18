@@ -22,8 +22,9 @@ public:
     class builder;
 
     MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS, DistanceUnit* measurementDistanceUnit)
-            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(temperatureValue), temperatureUnit(
-            temperatureUnit), responseTimeoutUS(responseTimeoutUS), measurementDistanceUnit(measurementDistanceUnit) {
+            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(
+            temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutUS(responseTimeoutUS), measurementDistanceUnit(
+            measurementDistanceUnit) {
     }
 
     Optional<unsigned int> getSamples() const {
