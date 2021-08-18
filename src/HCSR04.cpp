@@ -112,8 +112,7 @@ void HCSR04::sendTriggerSignalToHCSR04() {
 }
 
 HCSR04Response HCSR04::sendAndReceivedToHCSR04() {
-    /*TODO: From the macro or variable?!*/
-    return this->sendAndReceivedToHCSR04(DEFAULT_RESPONSE_TIMEOUT_US);
+    return this->sendAndReceivedToHCSR04(this->defaultResponseTimeoutUS);
 }
 
 HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS) {
