@@ -3,14 +3,7 @@
 HCSR04::HCSR04(const uint8_t& oneWirePin) : oneWirePin(oneWirePin) {
 
     this->isOneWireMode = true;
-
-    this->defaultSamples = DEFAULT_SAMPLES;
-    this->defaultMaxDistanceValue = DEFAULT_MAX_DISTANCE_CENTIMETERS;
-    this->defaultMaxDistanceUnit = DistanceUnit::CENTIMETERS;
-    this->defaultTemperatureValue = DEFAULT_TEMPERATURE_CELSIUS;
-    this->defaultTemperatureUnit = TemperatureUnit::CELSIUS;
-    this->defaultResponseTimeoutUS = DEFAULT_RESPONSE_TIMEOUT_US;
-    this->defaultMeasurementDistanceUnit = DistanceUnit::CENTIMETERS;
+    this->initializeDefaults();
 }
 
 HCSR04::HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin) : triggerPin(triggerPin), echoPin(echoPin) {
@@ -19,7 +12,10 @@ HCSR04::HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin) : triggerPin(t
     pinMode(this->echoPin, INPUT);
 
     this->isOneWireMode = false;
+    this->initializeDefaults();
+}
 
+void HCSR04::initializeDefaults() {
     this->defaultSamples = DEFAULT_SAMPLES;
     this->defaultMaxDistanceValue = DEFAULT_MAX_DISTANCE_CENTIMETERS;
     this->defaultMaxDistanceUnit = DistanceUnit::CENTIMETERS;

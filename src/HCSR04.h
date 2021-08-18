@@ -98,6 +98,8 @@ public:
     float calculateAverage(HCSR04Response* hcsr04Responses, const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration);
 
     void sendAndReceivedToHCSR04(HCSR04Response* hcsr04Responses, const MeasurementConfiguration& measurementConfiguration);
+
+    void initializeDefaults();
 };
 
 
