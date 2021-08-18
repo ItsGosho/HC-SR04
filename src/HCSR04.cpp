@@ -27,8 +27,28 @@ float HCSR04::calculateDistanceBySignalLength(const unsigned int& signalLength) 
  * @return The distance that the sensor measured in cm
  */
 float HCSR04::calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed) {
+
     float soundSpeedInCentimetersPerMicrosecond = this->convertMetersPerSecondToCentimetersPerMicrosecond(soundSpeed);
-    return (soundSpeedInCentimetersPerMicrosecond * static_cast<float>(signalLength)) / 2;
+    float distanceInCM = (soundSpeedInCentimetersPerMicrosecond * static_cast<float>(signalLength)) / 2;
+
+    return distanceInCM;
+}
+
+/**
+ * Will convert the signal length to the actual distance in the given unit
+ * The signal length represents the time the signal travelled per cm/us.
+ *
+ * @param signalLength The length of the HIGH signal from the HC-SR04 in microseconds
+ * @param soundSpeed The speed of the sound in meters per second
+ * @param distanceUnit In what distance unit the distance to be returned
+ * @return The distance that the sensor measured converted in the given one
+ */
+float HCSR04::calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed, const DistanceUnit& distanceUnit) {
+
+    float soundSpeedInCentimetersPerMicrosecond = this->convertMetersPerSecondToCentimetersPerMicrosecond(soundSpeed);
+    float distanceInCM = (soundSpeedInCentimetersPerMicrosecond * static_cast<float>(signalLength)) / 2;
+
+    return convertDistanceUnit(distanceInCM, DistanceUnit::CENTIMETERS, distanceUnit);
 }
 
 /**
@@ -97,7 +117,6 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
 
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
-    /*TODO: Optional.of / else / from*/
     /*TODO:They can pass in what distance unit they want to receive it*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
 
@@ -107,6 +126,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(TemperatureUnit::CELSIUS);
     float maxDistance = measurementConfiguration.getMaxDistance().orElseGet(DEFAULT_MAX_DISTANCE_CENTIMETERS);
     DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(DistanceUnit::CENTIMETERS);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(DistanceUnit::CENTIMETERS);
 
     float distancesSum = 0;
     unsigned int validSamples = 0;
@@ -121,19 +141,18 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     for (int i = 0; i < samples; i++) {
         HCSR04Response hcsr04Response = hcsr04Responses[i];
 
-        float soundSpeed = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
-        float distanceInCM = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
-                                                                                soundSpeed);
+        float soundSpeedMetersPerSecond = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
 
-        bool isMaxDistanceExceeded = convertDistanceUnit(distanceInCM,
-                                                         DistanceUnit::CENTIMETERS,
+        float distance = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
+                                                                                soundSpeedMetersPerSecond,
+                                                                                measurementDistanceUnit);
+
+        bool isMaxDistanceExceeded = convertDistanceUnit(distance,
+                                                         measurementDistanceUnit,
                                                          maxDistanceUnit) > maxDistance;
 
-        //NEW Response-a timeoutva ?!
-        //Serial.println(distanceInCM);
-
         if (!hcsr04Response.isSignalTimedOut() && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
-            distancesSum += distanceInCM;
+            distancesSum += distance;
             validSamples++;
         }
 
@@ -148,5 +167,5 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
 
     float distanceInCMAverage = distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
 
-    return Measurement{distanceInCMAverage, DistanceUnit::CENTIMETERS, samples, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
+    return Measurement{distanceInCMAverage, measurementDistanceUnit, samples, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
 }

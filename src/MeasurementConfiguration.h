@@ -16,12 +16,14 @@ private:
     float* temperature;
     TemperatureUnit* temperatureUnit;
     unsigned long* responseTimeoutUS;
+    DistanceUnit* measurementDistanceUnit;
 
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS)
-            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(temperatureUnit), responseTimeoutUS(responseTimeoutUS) {
+    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS, DistanceUnit* measurementDistanceUnit)
+            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(
+            temperatureUnit), responseTimeoutUS(responseTimeoutUS), measurementDistanceUnit(measurementDistanceUnit) {
     }
 
     Optional<unsigned int> getSamples() const {
@@ -48,6 +50,9 @@ public:
         return {this->responseTimeoutUS};
     }
 
+    Optional<DistanceUnit> getMeasurementDistanceUnit() const {
+        return {this->measurementDistanceUnit};
+    }
 };
 
 class MeasurementConfiguration::builder {
@@ -59,6 +64,7 @@ private:
     float* mTemperature;
     TemperatureUnit* mTemperatureUnit;
     unsigned long* mResponseTimeoutUS;
+    DistanceUnit* mMeasurementDistanceUnit;
 
 public:
     builder() {
@@ -68,6 +74,7 @@ public:
         this->mTemperature = nullptr;
         this->mTemperatureUnit = nullptr;
         this->mResponseTimeoutUS = nullptr;
+        this->mMeasurementDistanceUnit = nullptr;
     }
 
     builder& withSamples(const unsigned int& samples) {
@@ -92,14 +99,13 @@ public:
         return *this;
     }
 
-    MeasurementConfiguration build() const {
+    builder& withMeasurementDistanceUnit(const DistanceUnit& measurementDistanceUnit) {
+        this->mMeasurementDistanceUnit = &const_cast<DistanceUnit&>(measurementDistanceUnit);
+        return *this;
+    }
 
-        return MeasurementConfiguration(this->mSamples,
-                                        this->mMaxDistance,
-                                        this->mMaxDistanceUnit,
-                                        this->mTemperature,
-                                        this->mTemperatureUnit,
-                                        this->mResponseTimeoutUS);
+    MeasurementConfiguration build() const {
+        return {this->mSamples, this->mMaxDistance, this->mMaxDistanceUnit, this->mTemperature, this->mTemperatureUnit, this->mResponseTimeoutUS, this->mMeasurementDistanceUnit};
     }
 
 };

@@ -32,11 +32,35 @@ bool isButtonPressed() {
     return false;
 }
 
+const char* getDistanceUnitString(const DistanceUnit& distanceUnit) {
+
+    switch (distanceUnit) {
+
+        case DistanceUnit::CENTIMETERS:
+            return "centimeters";
+
+        case DistanceUnit::METERS:
+            return "meters";
+
+        case DistanceUnit::INCH:
+            return "inches";
+
+        case DistanceUnit::FEET:
+            return "feets";
+
+        case DistanceUnit::YARD:
+            return "yards";
+
+        default:
+            return "NOT IMPLEMENTED!";
+    }
+}
+
 void printMeasurement(Measurement measurement) {
     serial_printf(Serial,
                   "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
                   measurement.getDistance(),
-                  measurement.getDistanceUnit() == DistanceUnit::CENTIMETERS ? "cm" : "m",
+                  getDistanceUnitString(measurement.getDistanceUnit()),
                   measurement.getValidMeasurementsCount(),
                   measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
@@ -54,13 +78,12 @@ void loop() {
 
     if (isButtonPressed()) {
 
-        Measurement measurement = hcsr04.measure(
-                MeasurementConfiguration::builder()
+        Measurement measurement = hcsr04.measure(MeasurementConfiguration::builder()
                 .withSamples(5)
-                .withTemperature(1, TemperatureUnit::CELSIUS)
-                //.withMaxDistance(10,DistanceUnit::CENTIMETERS)
-                .build()
-                );
+                .withTemperature(1,TemperatureUnit::CELSIUS)
+                //.withMaxDistance(4,DistanceUnit::CENTIMETERS)
+                .withMeasurementDistanceUnit(DistanceUnit::FEET)
+                .build());
 
         printMeasurement(measurement);
 

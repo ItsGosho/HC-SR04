@@ -129,6 +129,8 @@ private:
 
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed);
 
+    float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed, const DistanceUnit& distanceUnit);
+
     float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
 
     float calculateSoundSpeedByTemperature(const float& temperature, const TemperatureUnit& temperatureUnit);
