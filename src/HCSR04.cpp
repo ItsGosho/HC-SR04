@@ -173,7 +173,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
                                                          measurementDistanceUnit,
                                                          maxDistanceUnit) > maxDistanceValue;
 
-        if (!hcsr04Response.isSignalTimedOut() && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
+        if (!hcsr04Response.isSignalTimedOut(TIMEOUT_SIGNAL_LENGTH_US) && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
             distancesSum += distance;
             validSamples++;
         }
@@ -181,7 +181,7 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
         //Note that there is priority
         if (hcsr04Response.isResponseTimedOut())
             responseTimedOutCount++;
-        else if (hcsr04Response.isSignalTimedOut())
+        else if (hcsr04Response.isSignalTimedOut(TIMEOUT_SIGNAL_LENGTH_US))
             signalTimedOutCount++;
         else if (isMaxDistanceExceeded)
             maxDistanceExceededCount++;

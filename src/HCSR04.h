@@ -2,8 +2,10 @@
 #define HC_SR04_HCSR04_H
 
 #include <Arduino.h>
-#include <MeasurementConfiguration.h>
-#include <Utils.h>
+#include "MeasurementConfiguration.h"
+#include "Utils.h"
+#include "Measurement.h"
+#include "HCSR04Response.h"
 
 #define TRIGGER_SIGNAL_LENGTH_US 10
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
@@ -23,100 +25,6 @@
  *  TODO: Kakvo e tova noInterrupts(); v arduino
  *
  * */
-
-/*TODO: Separate class .h and .cpp*/
-class Measurement {
-
-private:
-    float distance;
-    DistanceUnit distanceUnit;
-
-    unsigned int takenSamples;
-
-    unsigned int signalTimedOutCount;
-    unsigned int responseTimedOutCount;
-    unsigned int maxDistanceExceededCount;
-
-public:
-
-    Measurement() {
-        this->distance = 0.00f;
-        this->distanceUnit = DistanceUnit::CENTIMETERS;
-        this->signalTimedOutCount = 0;
-        this->responseTimedOutCount = 0;
-        this->maxDistanceExceededCount = 0;
-    }
-
-    Measurement(float distance, DistanceUnit distanceUnit, unsigned int takenSamples, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount)
-            : distance(distance), distanceUnit(distanceUnit), takenSamples(takenSamples), signalTimedOutCount(
-            signalTimedOutCount), responseTimedOutCount(responseTimedOutCount), maxDistanceExceededCount(
-            maxDistanceExceededCount) {
-    }
-
-    float getDistance() const {
-        return this->distance;
-    }
-
-    DistanceUnit getDistanceUnit() const {
-        return this->distanceUnit;
-    }
-
-    unsigned int getTakenSamples() const {
-        return this->takenSamples;
-    }
-
-    unsigned int getSignalTimedOutCount() const {
-        return this->signalTimedOutCount;
-    }
-
-    unsigned int getResponseTimedOutCount() const {
-        return this->responseTimedOutCount;
-    }
-
-    unsigned int getMaxDistanceExceededCount() const {
-        return this->maxDistanceExceededCount;
-    }
-
-    unsigned long getInvalidMeasurementsCount() {
-        return this->getSignalTimedOutCount() + this->getResponseTimedOutCount() + this->getMaxDistanceExceededCount();
-    }
-
-    unsigned long getValidMeasurementsCount() {
-        return this->takenSamples - this->getInvalidMeasurementsCount();
-    }
-};
-
-class HCSR04Response {
-
-private:
-    unsigned long mHighSignalLengthUS;
-    bool mIsResponseTimedOut;
-    bool mIsSignalTimedOut;
-
-public:
-
-    HCSR04Response() {
-        this->mHighSignalLengthUS = 0;
-        this->mIsResponseTimedOut = false;
-        this->mIsSignalTimedOut = false;
-    }
-
-    HCSR04Response(unsigned long mHighSignalLengthUs, bool mIsResponseTimedOut) : mHighSignalLengthUS(
-            mHighSignalLengthUs), mIsResponseTimedOut(mIsResponseTimedOut) {
-    }
-
-    unsigned long getHighSignalLengthUS() const {
-        return this->mHighSignalLengthUS;
-    }
-
-    bool isResponseTimedOut() const {
-        return this->mIsResponseTimedOut;
-    }
-
-    bool isSignalTimedOut() const {
-        return this->mHighSignalLengthUS >= TIMEOUT_SIGNAL_LENGTH_US;
-    }
-};
 
 class HCSR04 {
 
