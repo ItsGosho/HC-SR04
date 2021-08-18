@@ -11,6 +11,8 @@
  */
 bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
 
+    pinMode(digitalPin, INPUT);
+
     unsigned long start = micros();
 
     while (digitalRead(digitalPin) != expectedState) {
@@ -32,6 +34,8 @@ bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, con
  * @return If there was a timeout.
  */
 bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
+
+    pinMode(digitalPin, INPUT);
 
     unsigned long start = micros();
 
@@ -55,6 +59,8 @@ bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, cons
  */
 unsigned long measureSignalLength(const uint8_t& pin, const int& mode) {
 
+    pinMode(pin, INPUT);
+
     while (digitalRead(pin) != mode);
 
     unsigned long start = micros();
@@ -76,6 +82,7 @@ unsigned long measureSignalLength(const uint8_t& pin, const int& mode) {
  */
 SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const char& mode, const unsigned long& timeoutUS) {
 
+    pinMode(pin, INPUT);
 
     bool isWaitingTimedOut = waitStateNot(pin, mode, timeoutUS);
 

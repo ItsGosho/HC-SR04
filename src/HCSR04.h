@@ -118,17 +118,15 @@ public:
     }
 };
 
-#define DEFAULT_RESPONSE_TIMEOUT_US 1000000
-#define DEFAULT_SAMPLES 1
-#define DEFAULT_TEMPERATURE_CELSIUS 25.00f
-#define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
-
 class HCSR04 {
 
 private:
 
+    uint8_t oneWirePin;
     uint8_t triggerPin;
     uint8_t echoPin;
+
+    bool isOneWireMode;
 
     unsigned int defaultSamples;
     float defaultMaxDistanceValue;
@@ -151,6 +149,8 @@ private:
     void sendTriggerSignalToHCSR04();
 
 public:
+
+    HCSR04(const uint8_t& oneWirePin);
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
 

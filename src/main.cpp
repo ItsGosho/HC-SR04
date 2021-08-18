@@ -3,11 +3,12 @@
 #include "HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
+#define HCSR04_ONE_WIRE_PIN 9
 #define HCSR04_TRIGGER_PIN 10
 #define HCSR04_ECHO_PIN 11
 #define TEST_BUTTON_PIN 12
 
-HCSR04 hcsr04(HCSR04_TRIGGER_PIN, HCSR04_ECHO_PIN);
+HCSR04 hcsr04(HCSR04_ONE_WIRE_PIN);
 
 bool isButtonPressedAlready = false;
 

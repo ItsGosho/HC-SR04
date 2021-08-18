@@ -1,8 +1,24 @@
 #include "HCSR04.h"
 
+HCSR04::HCSR04(const uint8_t& oneWirePin) : oneWirePin(oneWirePin) {
+
+    this->isOneWireMode = true;
+
+    this->defaultSamples = DEFAULT_SAMPLES;
+    this->defaultMaxDistanceValue = DEFAULT_MAX_DISTANCE_CENTIMETERS;
+    this->defaultMaxDistanceUnit = DistanceUnit::CENTIMETERS;
+    this->defaultTemperatureValue = DEFAULT_TEMPERATURE_CELSIUS;
+    this->defaultTemperatureUnit = TemperatureUnit::CELSIUS;
+    this->defaultResponseTimeoutUS = DEFAULT_RESPONSE_TIMEOUT_US;
+    this->defaultMeasurementDistanceUnit = DistanceUnit::CENTIMETERS;
+}
+
 HCSR04::HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin) : triggerPin(triggerPin), echoPin(echoPin) {
+
     pinMode(this->triggerPin, OUTPUT);
     pinMode(this->echoPin, INPUT);
+
+    this->isOneWireMode = false;
 
     this->defaultSamples = DEFAULT_SAMPLES;
     this->defaultMaxDistanceValue = DEFAULT_MAX_DISTANCE_CENTIMETERS;
@@ -86,24 +102,26 @@ float HCSR04::calculateSoundSpeedByTemperature(const float& temperature, const T
 
 void HCSR04::sendTriggerSignalToHCSR04() {
 
-    digitalWrite(this->triggerPin, HIGH);
+    uint8_t pin = this->isOneWireMode ? this->oneWirePin : this->triggerPin;
+
+    pinMode(pin, OUTPUT);
+
+    digitalWrite(pin, HIGH);
     delayMicroseconds(TRIGGER_SIGNAL_LENGTH_US);
-    digitalWrite(this->triggerPin, LOW);
+    digitalWrite(pin, LOW);
 }
 
 HCSR04Response HCSR04::sendAndReceivedToHCSR04() {
-
-    this->sendTriggerSignalToHCSR04();
-    unsigned long responseSignalLength = measureSignalLength(this->echoPin, HIGH);
-
-    delay(COOL_DOWN_DELAY_MS);
-    return {responseSignalLength, false};
+    /*TODO: From the macro or variable?!*/
+    return this->sendAndReceivedToHCSR04(DEFAULT_RESPONSE_TIMEOUT_US);
 }
 
 HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS) {
 
     this->sendTriggerSignalToHCSR04();
-    SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(this->echoPin, HIGH, responseTimeOutUS);
+
+    uint8_t measurementPin = this->isOneWireMode ? this->oneWirePin : this->echoPin;
+    SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(measurementPin, HIGH, responseTimeOutUS);
 
     delay(COOL_DOWN_DELAY_MS);
     return {signalLengthMeasurementUs.signalLengthUS, signalLengthMeasurementUs.isTimedOut};
@@ -124,9 +142,6 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
 }
 
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
-
-    /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
-    /*TODO: I shte stane base.orElseGet(ot set-a).orElseGet(ot macroto)*/
 
     unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(this->defaultResponseTimeoutUS);
     unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
