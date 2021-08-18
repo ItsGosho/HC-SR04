@@ -118,12 +118,25 @@ public:
     }
 };
 
+#define DEFAULT_RESPONSE_TIMEOUT_US 1000000
+#define DEFAULT_SAMPLES 1
+#define DEFAULT_TEMPERATURE_CELSIUS 25.00f
+#define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
+
 class HCSR04 {
 
 private:
 
     uint8_t triggerPin;
     uint8_t echoPin;
+
+    unsigned int defaultSamples;
+    float defaultMaxDistanceValue;
+    DistanceUnit defaultMaxDistanceUnit;
+    float defaultTemperatureValue;
+    TemperatureUnit defaultTemperatureUnit;
+    unsigned long defaultResponseTimeoutUS;
+    DistanceUnit defaultMeasurementDistanceUnit;
 
     float calculateDistanceBySignalLength(const unsigned int& signalLength);
 
@@ -150,6 +163,20 @@ public:
     void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS);
 
     HCSR04Response sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS);
+
+    void setDefaultSamples(const unsigned int& defaultSamples);
+
+    void setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue);
+
+    void setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit);
+
+    void setDefaultTemperatureValue(const float& defaultTemperatureValue);
+
+    void setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit);
+
+    void setDefaultResponseTimeoutUs(const unsigned long& defaultResponseTimeoutUs);
+
+    void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
 };
 
 

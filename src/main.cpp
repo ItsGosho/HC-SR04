@@ -72,6 +72,8 @@ void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
 
     pinMode(TEST_BUTTON_PIN, INPUT);
+
+    hcsr04.setDefaultSamples(5);
 }
 
 void loop() {
@@ -79,10 +81,10 @@ void loop() {
     if (isButtonPressed()) {
 
         Measurement measurement = hcsr04.measure(MeasurementConfiguration::builder()
-                .withSamples(5)
-                .withTemperature(1,TemperatureUnit::CELSIUS)
+                .withSamples(3)
+                //.withTemperature(1,TemperatureUnit::CELSIUS)
                 //.withMaxDistance(4,DistanceUnit::CENTIMETERS)
-                .withMeasurementDistanceUnit(DistanceUnit::FEET)
+                //.withMeasurementDistanceUnit(DistanceUnit::FEET)
                 .build());
 
         printMeasurement(measurement);

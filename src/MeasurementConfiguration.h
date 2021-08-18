@@ -11,9 +11,9 @@ class MeasurementConfiguration {
 private:
 
     unsigned int* samples;
-    float* maxDistance;
+    float* maxDistanceValue;
     DistanceUnit* maxDistanceUnit;
-    float* temperature;
+    float* temperatureValue;
     TemperatureUnit* temperatureUnit;
     unsigned long* responseTimeoutUS;
     DistanceUnit* measurementDistanceUnit;
@@ -21,8 +21,8 @@ private:
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistance, DistanceUnit* maxDistanceUnit, float* temperature, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS, DistanceUnit* measurementDistanceUnit)
-            : samples(samples), maxDistance(maxDistance), maxDistanceUnit(maxDistanceUnit), temperature(temperature), temperatureUnit(
+    MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS, DistanceUnit* measurementDistanceUnit)
+            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(temperatureValue), temperatureUnit(
             temperatureUnit), responseTimeoutUS(responseTimeoutUS), measurementDistanceUnit(measurementDistanceUnit) {
     }
 
@@ -30,16 +30,16 @@ public:
         return {this->samples};
     }
 
-    Optional<float> getMaxDistance() const {
-        return {this->maxDistance};
+    Optional<float> getMaxDistanceValue() const {
+        return {this->maxDistanceValue};
     }
 
     Optional<DistanceUnit> getMaxDistanceUnit() const {
         return {this->maxDistanceUnit};
     }
 
-    Optional<float> getTemperature() const {
-        return {this->temperature};
+    Optional<float> getTemperatureValue() const {
+        return {this->temperatureValue};
     }
 
     Optional<TemperatureUnit> getTemperatureUnit() const {
@@ -59,9 +59,9 @@ class MeasurementConfiguration::builder {
 
 private:
     unsigned int* mSamples;
-    float* mMaxDistance;
+    float* mMaxDistanceValue;
     DistanceUnit* mMaxDistanceUnit;
-    float* mTemperature;
+    float* mTemperatureValue;
     TemperatureUnit* mTemperatureUnit;
     unsigned long* mResponseTimeoutUS;
     DistanceUnit* mMeasurementDistanceUnit;
@@ -69,9 +69,9 @@ private:
 public:
     builder() {
         this->mSamples = nullptr;
-        this->mMaxDistance = nullptr;
+        this->mMaxDistanceValue = nullptr;
         this->mMaxDistanceUnit = nullptr;
-        this->mTemperature = nullptr;
+        this->mTemperatureValue = nullptr;
         this->mTemperatureUnit = nullptr;
         this->mResponseTimeoutUS = nullptr;
         this->mMeasurementDistanceUnit = nullptr;
@@ -83,13 +83,13 @@ public:
     }
 
     builder& withMaxDistance(const float& maxDistance, const DistanceUnit& maxDistanceUnit) {
-        this->mMaxDistance = &const_cast<float&>(maxDistance);
+        this->mMaxDistanceValue = &const_cast<float&>(maxDistance);
         this->mMaxDistanceUnit = &const_cast<DistanceUnit&>(maxDistanceUnit);
         return *this;
     }
 
     builder& withTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
-        this->mTemperature = &const_cast<float&>(temperature);
+        this->mTemperatureValue = &const_cast<float&>(temperature);
         this->mTemperatureUnit = &const_cast<TemperatureUnit&>(temperatureUnit);
         return *this;
     }
@@ -105,7 +105,7 @@ public:
     }
 
     MeasurementConfiguration build() const {
-        return {this->mSamples, this->mMaxDistance, this->mMaxDistanceUnit, this->mTemperature, this->mTemperatureUnit, this->mResponseTimeoutUS, this->mMeasurementDistanceUnit};
+        return {this->mSamples, this->mMaxDistanceValue, this->mMaxDistanceUnit, this->mTemperatureValue, this->mTemperatureUnit, this->mResponseTimeoutUS, this->mMeasurementDistanceUnit};
     }
 
 };

@@ -3,6 +3,14 @@
 HCSR04::HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin) : triggerPin(triggerPin), echoPin(echoPin) {
     pinMode(this->triggerPin, OUTPUT);
     pinMode(this->echoPin, INPUT);
+
+    this->defaultSamples = DEFAULT_SAMPLES;
+    this->defaultMaxDistanceValue = DEFAULT_MAX_DISTANCE_CENTIMETERS;
+    this->defaultMaxDistanceUnit = DistanceUnit::CENTIMETERS;
+    this->defaultTemperatureValue = DEFAULT_TEMPERATURE_CELSIUS;
+    this->defaultTemperatureUnit = TemperatureUnit::CELSIUS;
+    this->defaultResponseTimeoutUS = DEFAULT_RESPONSE_TIMEOUT_US;
+    this->defaultMeasurementDistanceUnit = DistanceUnit::CENTIMETERS;
 }
 
 /**
@@ -117,16 +125,16 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
 
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
-    /*TODO:They can pass in what distance unit they want to receive it*/
     /*TODO: Option to set them directly and the priority koeto si pisah na tetradkata*/
+    /*TODO: I shte stane base.orElseGet(ot set-a).orElseGet(ot macroto)*/
 
-    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(DEFAULT_RESPONSE_TIMEOUT_US);
-    unsigned int samples = measurementConfiguration.getSamples().orElseGet(DEFAULT_SAMPLES);
-    float temperature = measurementConfiguration.getTemperature().orElseGet(DEFAULT_TEMPERATURE_CELSIUS);
-    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(TemperatureUnit::CELSIUS);
-    float maxDistance = measurementConfiguration.getMaxDistance().orElseGet(DEFAULT_MAX_DISTANCE_CENTIMETERS);
-    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(DistanceUnit::CENTIMETERS);
-    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(DistanceUnit::CENTIMETERS);
+    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(this->defaultResponseTimeoutUS);
+    unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
+    float temperatureValue = measurementConfiguration.getTemperatureValue().orElseGet(this->defaultTemperatureValue);
+    TemperatureUnit temperatureUnit = measurementConfiguration.getTemperatureUnit().orElseGet(this->defaultTemperatureUnit);
+    float maxDistanceValue = measurementConfiguration.getMaxDistanceValue().orElseGet(this->defaultMaxDistanceValue);
+    DistanceUnit maxDistanceUnit = measurementConfiguration.getMaxDistanceUnit().orElseGet(this->defaultMaxDistanceUnit);
+    DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);
 
     float distancesSum = 0;
     unsigned int validSamples = 0;
@@ -141,15 +149,15 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     for (int i = 0; i < samples; i++) {
         HCSR04Response hcsr04Response = hcsr04Responses[i];
 
-        float soundSpeedMetersPerSecond = this->calculateSoundSpeedByTemperature(temperature, temperatureUnit);
+        float soundSpeedMetersPerSecond = this->calculateSoundSpeedByTemperature(temperatureValue, temperatureUnit);
 
         float distance = this->calculateDistanceBySignalLengthAndSoundSpeed(hcsr04Response.getHighSignalLengthUS(),
-                                                                                soundSpeedMetersPerSecond,
-                                                                                measurementDistanceUnit);
+                                                                            soundSpeedMetersPerSecond,
+                                                                            measurementDistanceUnit);
 
         bool isMaxDistanceExceeded = convertDistanceUnit(distance,
                                                          measurementDistanceUnit,
-                                                         maxDistanceUnit) > maxDistance;
+                                                         maxDistanceUnit) > maxDistanceValue;
 
         if (!hcsr04Response.isSignalTimedOut() && !hcsr04Response.isResponseTimedOut() && !isMaxDistanceExceeded) {
             distancesSum += distance;
@@ -161,11 +169,39 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
             responseTimedOutCount++;
         else if (hcsr04Response.isSignalTimedOut())
             signalTimedOutCount++;
-        else if(isMaxDistanceExceeded)
+        else if (isMaxDistanceExceeded)
             maxDistanceExceededCount++;
     }
 
     float distanceInCMAverage = distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
 
     return Measurement{distanceInCMAverage, measurementDistanceUnit, samples, signalTimedOutCount, responseTimedOutCount, maxDistanceExceededCount};;
+}
+
+void HCSR04::setDefaultSamples(const unsigned int& defaultSamples) {
+    HCSR04::defaultSamples = defaultSamples;
+}
+
+void HCSR04::setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue) {
+    HCSR04::defaultMaxDistanceValue = defaultMaxDistanceValue;
+}
+
+void HCSR04::setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit) {
+    HCSR04::defaultMaxDistanceUnit = defaultMaxDistanceUnit;
+}
+
+void HCSR04::setDefaultTemperatureValue(const float& defaultTemperatureValue) {
+    HCSR04::defaultTemperatureValue = defaultTemperatureValue;
+}
+
+void HCSR04::setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit) {
+    HCSR04::defaultTemperatureUnit = defaultTemperatureUnit;
+}
+
+void HCSR04::setDefaultResponseTimeoutUs(const unsigned long& defaultResponseTimeoutUs) {
+    defaultResponseTimeoutUS = defaultResponseTimeoutUs;
+}
+
+void HCSR04::setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit) {
+    HCSR04::defaultMeasurementDistanceUnit = defaultMeasurementDistanceUnit;
 }
