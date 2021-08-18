@@ -45,10 +45,6 @@ private:
     unsigned long defaultResponseTimeoutUS;
     DistanceUnit defaultMeasurementDistanceUnit;
 
-    float calculateDistanceBySignalLength(const unsigned int& signalLength);
-
-    float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed);
-
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed, const DistanceUnit& distanceUnit);
 
     float convertMetersPerSecondToCentimetersPerMicrosecond(const float& metersPerSecond);
@@ -57,6 +53,7 @@ private:
 
     void sendTriggerSignalToHCSR04();
 
+    /*TODO: Which to go private?!*/
 public:
 
     HCSR04(const uint8_t& oneWirePin);
@@ -64,10 +61,6 @@ public:
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
 
     Measurement measure(const MeasurementConfiguration& configuration);
-
-    HCSR04Response sendAndReceivedToHCSR04();
-
-    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times);
 
     void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS);
 
