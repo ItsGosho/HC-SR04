@@ -55,6 +55,7 @@ public:
     }
 };
 
+/*TODO: Explain each of the withX parameters/methods*/
 class MeasurementConfiguration::builder {
 
 private:
