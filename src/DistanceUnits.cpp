@@ -21,8 +21,8 @@ float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, c
         case DistanceUnit::INCH:
             return convertInchesTo(distance, toUnit);
 
-        case DistanceUnit::FEET:
-            return convertFeetTo(distance, toUnit);
+        case DistanceUnit::FOOT:
+            return convertFootTo(distance, toUnit);
 
         case DistanceUnit::YARD:
             return convertYardsTo(distance, toUnit);
@@ -35,7 +35,7 @@ float convertDistanceUnit(const float& distance, const DistanceUnit& fromUnit, c
 /**
  * Will convert the given centimeters to the given distance unit
  *
- * @param feet The centimeters to be converted
+ * @param centimeters The centimeters to be converted
  * @param toUnit The unit that the centimeters will be converted
  * @return The converted centimeters to the given unit. -1 If the given toUnit is not yet implemented.
  */
@@ -52,7 +52,7 @@ float convertCentimetersTo(const float& centimeters, const DistanceUnit& toUnit)
         case DistanceUnit::INCH:
             return centimeters * 0.393700787f;
 
-        case DistanceUnit::FEET:
+        case DistanceUnit::FOOT:
             return centimeters * 0.032808399f;
 
         case DistanceUnit::YARD:
@@ -67,7 +67,7 @@ float convertCentimetersTo(const float& centimeters, const DistanceUnit& toUnit)
 /**
  * Will convert the given meters to the given distance unit
  *
- * @param feet The meters to be converted
+ * @param meters The meters to be converted
  * @param toUnit The unit that the meters will be converted
  * @return The converted meters to the given unit. -1 If the given toUnit is not yet implemented.
  */
@@ -84,7 +84,7 @@ float convertMetersTo(const float& meters, const DistanceUnit& toUnit) {
         case DistanceUnit::INCH:
             return meters * 39.3700787f;
 
-        case DistanceUnit::FEET:
+        case DistanceUnit::FOOT:
             return meters * 3.2808399f;
 
         case DistanceUnit::YARD:
@@ -98,7 +98,7 @@ float convertMetersTo(const float& meters, const DistanceUnit& toUnit) {
 /**
  * Will convert the given inches to the given distance unit
  *
- * @param feet The inches to be converted
+ * @param inches The inches to be converted
  * @param toUnit The unit that the inches will be converted
  * @return The converted inches to the given unit. -1 If the given toUnit is not yet implemented.
  */
@@ -115,7 +115,7 @@ float convertInchesTo(const float& inches, const DistanceUnit& toUnit) {
         case DistanceUnit::INCH:
             return inches;
 
-        case DistanceUnit::FEET:
+        case DistanceUnit::FOOT:
             return inches * 0.0833333333f;
 
         case DistanceUnit::YARD:
@@ -127,30 +127,30 @@ float convertInchesTo(const float& inches, const DistanceUnit& toUnit) {
 }
 
 /**
- * Will convert the given feet to the given distance unit
+ * Will convert the given foot to the given distance unit
  *
- * @param feet The feet to be converted
- * @param toUnit The unit that the feet will be converted
- * @return The converted feet to the given unit. -1 If the given toUnit is not yet implemented.
+ * @param foot The foot to be converted
+ * @param toUnit The unit that the foot will be converted
+ * @return The converted foot to the given unit. -1 If the given toUnit is not yet implemented.
  */
-float convertFeetTo(const float& feet, const DistanceUnit& toUnit) {
+float convertFootTo(const float& foot, const DistanceUnit& toUnit) {
 
     switch (toUnit) {
 
         case DistanceUnit::CENTIMETERS:
-            return feet * 30.48f;
+            return foot * 30.48f;
 
         case DistanceUnit::METERS:
-            return feet * 0.3048f;
+            return foot * 0.3048f;
 
         case DistanceUnit::INCH:
-            return feet * 12.00f;
+            return foot * 12.00f;
 
-        case DistanceUnit::FEET:
-            return feet;
+        case DistanceUnit::FOOT:
+            return foot;
 
         case DistanceUnit::YARD:
-            return feet * 0.333333333f;
+            return foot * 0.333333333f;
 
         default:
             return -1;
@@ -177,7 +177,7 @@ float convertYardsTo(const float& yards, const DistanceUnit& toUnit) {
         case DistanceUnit::INCH:
             return yards * 36.00f;
 
-        case DistanceUnit::FEET:
+        case DistanceUnit::FOOT:
             return yards * 3.00f;
 
         case DistanceUnit::YARD:
