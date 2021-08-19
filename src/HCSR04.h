@@ -82,13 +82,9 @@ public:
 
     void setDefaultSamples(const unsigned int& defaultSamples);
 
-    void setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue);
+    void setDefaultMaxDistance(const float& defaultMaxDistanceValue, const DistanceUnit& defaultMaxDistanceUnit);
 
-    void setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit);
-
-    void setDefaultTemperatureValue(const float& defaultTemperatureValue);
-
-    void setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit);
+    void setDefaultTemperature(const float& defaultTemperatureValue, const TemperatureUnit& defaultTemperatureUnit);
 
     void setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS);
 

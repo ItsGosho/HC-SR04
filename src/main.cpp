@@ -11,10 +11,8 @@ void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
 
     hcsr04.setDefaultSamples(5);
-    hcsr04.setDefaultTemperatureValue(21.55);
-    hcsr04.setDefaultTemperatureUnit(TemperatureUnit::CELSIUS);
-    hcsr04.setDefaultMaxDistanceValue(1);
-    hcsr04.setDefaultMaxDistanceUnit(DistanceUnit::METERS);
+    hcsr04.setDefaultTemperature(21.55, TemperatureUnit::CELSIUS);
+    hcsr04.setDefaultMaxDistance(1, DistanceUnit::METERS);
     hcsr04.setDefaultMeasurementDistanceUnit(DistanceUnit::CENTIMETERS);
     hcsr04.setDefaultResponseTimeoutMS(300);
 }

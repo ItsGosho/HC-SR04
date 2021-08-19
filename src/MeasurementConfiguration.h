@@ -22,9 +22,7 @@ public:
     class builder;
 
     MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutMS, DistanceUnit* measurementDistanceUnit)
-            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(
-            temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutMS(responseTimeoutMS), measurementDistanceUnit(
-            measurementDistanceUnit) {
+            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutMS(responseTimeoutMS), measurementDistanceUnit(measurementDistanceUnit) {
     }
 
     Optional<unsigned int> getSamples() const {
@@ -79,28 +77,46 @@ public:
         this->mMeasurementDistanceUnit = nullptr;
     }
 
+    /**
+      * How many times to take measurement. Then the returned distance will be the average of a valid measurements.
+      */
     builder& withSamples(const unsigned int& samples) {
         this->mSamples = &const_cast<unsigned int&>(samples);
         return *this;
     }
 
+    /**
+      * The maximum distance that is allowed. If a measurement's distance exceeds it, then the measurement is invalid.
+      */
     builder& withMaxDistance(const float& maxDistance, const DistanceUnit& maxDistanceUnit) {
         this->mMaxDistanceValue = &const_cast<float&>(maxDistance);
         this->mMaxDistanceUnit = &const_cast<DistanceUnit&>(maxDistanceUnit);
         return *this;
     }
 
+    /**
+      *  The ambient temperature.
+      * Increases the accuracy of the measurement, because the sound speed is dependent on temperature.
+      */
     builder& withTemperature(const float& temperature, const TemperatureUnit& temperatureUnit) {
         this->mTemperatureValue = &const_cast<float&>(temperature);
         this->mTemperatureUnit = &const_cast<TemperatureUnit&>(temperatureUnit);
         return *this;
     }
 
+    /**
+      * The maximum time to take a measurement.
+      * If the time is exceeded then the measurement is invalid.
+      * Indication when there is something wrong with the communication to the device eg: not connected
+      */
     builder& withResponseTimeoutMS(const unsigned long& responseTimeoutMS) {
         this->mResponseTimeoutMS = &const_cast<unsigned long&>(responseTimeoutMS);
         return *this;
     }
 
+    /**
+      * In what distance unit the measurement will be returned.
+      */
     builder& withMeasurementDistanceUnit(const DistanceUnit& measurementDistanceUnit) {
         this->mMeasurementDistanceUnit = &const_cast<DistanceUnit&>(measurementDistanceUnit);
         return *this;

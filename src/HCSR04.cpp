@@ -267,33 +267,42 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
     return Measurement{averageDistance, measurementDistanceUnit, samples, hcsr04ResponseErrors.signalTimedOutCount, hcsr04ResponseErrors.responseTimedOutCount, hcsr04ResponseErrors.maxDistanceExceededCount};;
 }
 
-/*TODO: Tezi set-ove dokumentaciq i primeri v readme-to blah blah*/
+/**
+ * How many times to take measurement. Then the returned distance will be the average of a valid measurements.
+ */
 void HCSR04::setDefaultSamples(const unsigned int& defaultSamples) {
     HCSR04::defaultSamples = defaultSamples;
 }
 
-void HCSR04::setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue) {
+/**
+ * The maximum distance that is allowed. If a measurement's distance exceeds it, then the measurement is invalid.
+ */
+void HCSR04::setDefaultMaxDistance(const float& defaultMaxDistanceValue, const DistanceUnit& defaultMaxDistanceUnit) {
     HCSR04::defaultMaxDistanceValue = defaultMaxDistanceValue;
-}
-
-//Combine the set of max distance with the unit
-void HCSR04::setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit) {
     HCSR04::defaultMaxDistanceUnit = defaultMaxDistanceUnit;
 }
 
-//Combine the set of temperature with the unit
-void HCSR04::setDefaultTemperatureValue(const float& defaultTemperatureValue) {
+/**
+ *  The ambient temperature.
+  * Increases the accuracy of the measurement, because the sound speed is dependent on temperature.
+ */
+void HCSR04::setDefaultTemperature(const float& defaultTemperatureValue, const TemperatureUnit& defaultTemperatureUnit) {
     HCSR04::defaultTemperatureValue = defaultTemperatureValue;
-}
-
-void HCSR04::setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit) {
     HCSR04::defaultTemperatureUnit = defaultTemperatureUnit;
 }
 
+/**
+ * The maximum time to take a measurement.
+ * If the time is exceeded then the measurement is invalid.
+ * Indication when there is something wrong with the communication to the device eg: not connected
+ */
 void HCSR04::setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS) {
     HCSR04::defaultResponseTimeoutMS = defaultResponseTimeoutMS;
 }
 
+/**
+ * In what distance unit the measurement will be returned.
+ */
 void HCSR04::setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit) {
     HCSR04::defaultMeasurementDistanceUnit = defaultMeasurementDistanceUnit;
 }
