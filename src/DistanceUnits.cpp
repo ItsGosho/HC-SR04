@@ -187,3 +187,31 @@ float convertYardsTo(const float& yards, const DistanceUnit& toUnit) {
             return -1;
     }
 }
+
+/**
+ * Will return the abbreviation of the distance unit.
+ * For example DistanceUnit::CENTIMETERS will return cm
+ */
+const char* getDistanceUnitAbbreviation(const DistanceUnit& distanceUnit) {
+
+    switch (distanceUnit) {
+
+        case DistanceUnit::CENTIMETERS:
+            return "cm";
+
+        case DistanceUnit::METERS:
+            return "m";
+
+        case DistanceUnit::INCH:
+            return "in";
+
+        case DistanceUnit::FOOT:
+            return "ft";
+
+        case DistanceUnit::YARD:
+            return "yd";
+
+        default:
+            return "??";
+    }
+}
