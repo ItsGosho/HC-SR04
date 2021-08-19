@@ -26,6 +26,8 @@ Arduino communication library for the HC-SR04 ultrasonic sensor.
 
 In the examples the HC-SR04 is used in **one wire mode**. The library **supports one and two wires**.
 
+Copy the content of the `src/hcsr04` folder and place it in your project.
+
 
 
 ##### Simple example:
