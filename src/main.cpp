@@ -9,22 +9,20 @@ HCSR04 hcsr04(HCSR04_ONE_WIRE_PIN);
 
 void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
+
+    hcsr04.setDefaultSamples(5);
+    hcsr04.setDefaultTemperatureValue(21.55);
+    hcsr04.setDefaultTemperatureUnit(TemperatureUnit::CELSIUS);
+    hcsr04.setDefaultMaxDistanceValue(1);
+    hcsr04.setDefaultMaxDistanceUnit(DistanceUnit::METERS);
+    hcsr04.setDefaultMeasurementDistanceUnit(DistanceUnit::CENTIMETERS);
+    hcsr04.setDefaultResponseTimeoutMS(300);
 }
 
 void loop() {
 
 
-    unsigned long start = millis();
-    Measurement measurement = hcsr04.measure(
-            MeasurementConfiguration::builder()
-                        .withSamples(5)
-                        .withTemperature(35,TemperatureUnit::CELSIUS)
-                        .withMaxDistance(20,DistanceUnit::CENTIMETERS)
-                        .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
-                        .withResponseTimeoutMS(300)
-                        .build());
-
-    Serial.println(millis() - start);
+    Measurement measurement = hcsr04.measure();
 
     serial_printf(Serial,
                   "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",

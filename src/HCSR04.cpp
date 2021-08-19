@@ -276,10 +276,12 @@ void HCSR04::setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue) {
     HCSR04::defaultMaxDistanceValue = defaultMaxDistanceValue;
 }
 
+//Combine the set of max distance with the unit
 void HCSR04::setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit) {
     HCSR04::defaultMaxDistanceUnit = defaultMaxDistanceUnit;
 }
 
+//Combine the set of temperature with the unit
 void HCSR04::setDefaultTemperatureValue(const float& defaultTemperatureValue) {
     HCSR04::defaultTemperatureValue = defaultTemperatureValue;
 }

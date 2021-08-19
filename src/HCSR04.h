@@ -12,7 +12,7 @@
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
 #define COOL_DOWN_DELAY_MS 60
 
-#define DEFAULT_RESPONSE_TIMEOUT_MS 500
+#define DEFAULT_RESPONSE_TIMEOUT_MS 75
 #define DEFAULT_SAMPLES 3
 #define DEFAULT_TEMPERATURE_CELSIUS 25.00f
 #define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
@@ -57,20 +57,6 @@ private:
 
     HCSR04Response sendAndReceivedToHCSR04(const unsigned long& defaultResponseTimeoutMS);
 
-    void setDefaultSamples(const unsigned int& defaultSamples);
-
-    void setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue);
-
-    void setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit);
-
-    void setDefaultTemperatureValue(const float& defaultTemperatureValue);
-
-    void setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit);
-
-    void setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS);
-
-    void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
-
     bool isMaxDistanceExceeded(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration);
 
     bool isResponseValid(const MeasurementConfiguration& measurementConfiguration, const HCSR04Response& hcsr04Response);
@@ -93,6 +79,20 @@ public:
     Measurement measure();
 
     Measurement measure(const MeasurementConfiguration& configuration);
+
+    void setDefaultSamples(const unsigned int& defaultSamples);
+
+    void setDefaultMaxDistanceValue(const float& defaultMaxDistanceValue);
+
+    void setDefaultMaxDistanceUnit(const DistanceUnit& defaultMaxDistanceUnit);
+
+    void setDefaultTemperatureValue(const float& defaultTemperatureValue);
+
+    void setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit);
+
+    void setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS);
+
+    void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
 };
 
 
