@@ -15,6 +15,7 @@ void setup() {
 
 void loop() {
 
+
     Measurement measurement = hcsr04.measure(MeasurementConfiguration::builder()
             .withSamples(3)
             //.withTemperature(1,TemperatureUnit::CELSIUS)
@@ -30,6 +31,4 @@ void loop() {
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
                   measurement.getMaxDistanceExceededCount());
-
-    Serial.println("----------------------------------");
 }

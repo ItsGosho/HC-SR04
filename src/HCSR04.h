@@ -53,15 +53,6 @@ private:
 
     void sendTriggerSignalToHCSR04();
 
-    /*TODO: Which to go private?!*/
-public:
-
-    HCSR04(const uint8_t& oneWirePin);
-
-    HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
-
-    Measurement measure(const MeasurementConfiguration& configuration);
-
     void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS);
 
     HCSR04Response sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS);
@@ -93,6 +84,13 @@ public:
     void sendAndReceivedToHCSR04(HCSR04Response* hcsr04Responses, const MeasurementConfiguration& measurementConfiguration);
 
     void initializeDefaults();
+public:
+
+    HCSR04(const uint8_t& oneWirePin);
+
+    HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
+
+    Measurement measure(const MeasurementConfiguration& configuration);
 };
 
 
