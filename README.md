@@ -1,7 +1,7 @@
 # HC-SR04
 Arduino communication library for the HC-SR04 ultrasonic sensor.
 
-
+<img src="HCSR04-Sensor.jpg" width="200px" height="200px"  />
 
 ###### Features:
 
