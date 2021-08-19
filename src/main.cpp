@@ -4,8 +4,6 @@
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9
-#define HCSR04_TRIGGER_PIN 10
-#define HCSR04_ECHO_PIN 11
 
 HCSR04 hcsr04(HCSR04_ONE_WIRE_PIN);
 
@@ -16,12 +14,17 @@ void setup() {
 void loop() {
 
 
-    Measurement measurement = hcsr04.measure(MeasurementConfiguration::builder()
-            .withSamples(3)
-            //.withTemperature(1,TemperatureUnit::CELSIUS)
-            //.withMaxDistance(4,DistanceUnit::CENTIMETERS)
-            //.withMeasurementDistanceUnit(DistanceUnit::FOOT)
-                                                     .build());
+    unsigned long start = millis();
+    Measurement measurement = hcsr04.measure(
+            MeasurementConfiguration::builder()
+                        .withSamples(5)
+                        .withTemperature(35,TemperatureUnit::CELSIUS)
+                        .withMaxDistance(20,DistanceUnit::CENTIMETERS)
+                        .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
+                        .withResponseTimeoutMS(300)
+                        .build());
+
+    Serial.println(millis() - start);
 
     serial_printf(Serial,
                   "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",

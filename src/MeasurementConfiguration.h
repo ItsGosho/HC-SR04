@@ -15,15 +15,15 @@ private:
     DistanceUnit* maxDistanceUnit;
     float* temperatureValue;
     TemperatureUnit* temperatureUnit;
-    unsigned long* responseTimeoutUS;
+    unsigned long* responseTimeoutMS;
     DistanceUnit* measurementDistanceUnit;
 
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutUS, DistanceUnit* measurementDistanceUnit)
+    MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutMS, DistanceUnit* measurementDistanceUnit)
             : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(
-            temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutUS(responseTimeoutUS), measurementDistanceUnit(
+            temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutMS(responseTimeoutMS), measurementDistanceUnit(
             measurementDistanceUnit) {
     }
 
@@ -47,8 +47,8 @@ public:
         return {this->temperatureUnit};
     }
 
-    Optional<unsigned long> getResponseTimeoutUS() const {
-        return {this->responseTimeoutUS};
+    Optional<unsigned long> getResponseTimeoutMS() const {
+        return {this->responseTimeoutMS};
     }
 
     Optional<DistanceUnit> getMeasurementDistanceUnit() const {
@@ -65,7 +65,7 @@ private:
     DistanceUnit* mMaxDistanceUnit;
     float* mTemperatureValue;
     TemperatureUnit* mTemperatureUnit;
-    unsigned long* mResponseTimeoutUS;
+    unsigned long* mResponseTimeoutMS;
     DistanceUnit* mMeasurementDistanceUnit;
 
 public:
@@ -75,7 +75,7 @@ public:
         this->mMaxDistanceUnit = nullptr;
         this->mTemperatureValue = nullptr;
         this->mTemperatureUnit = nullptr;
-        this->mResponseTimeoutUS = nullptr;
+        this->mResponseTimeoutMS = nullptr;
         this->mMeasurementDistanceUnit = nullptr;
     }
 
@@ -96,8 +96,8 @@ public:
         return *this;
     }
 
-    builder& withResponseTimeoutUS(const unsigned long& responseTimeoutUS) {
-        this->mResponseTimeoutUS = &const_cast<unsigned long&>(responseTimeoutUS);
+    builder& withResponseTimeoutMS(const unsigned long& responseTimeoutMS) {
+        this->mResponseTimeoutMS = &const_cast<unsigned long&>(responseTimeoutMS);
         return *this;
     }
 
@@ -107,7 +107,7 @@ public:
     }
 
     MeasurementConfiguration build() const {
-        return {this->mSamples, this->mMaxDistanceValue, this->mMaxDistanceUnit, this->mTemperatureValue, this->mTemperatureUnit, this->mResponseTimeoutUS, this->mMeasurementDistanceUnit};
+        return {this->mSamples, this->mMaxDistanceValue, this->mMaxDistanceUnit, this->mTemperatureValue, this->mTemperatureUnit, this->mResponseTimeoutMS, this->mMeasurementDistanceUnit};
     }
 
 };

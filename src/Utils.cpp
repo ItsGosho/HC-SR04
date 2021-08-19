@@ -6,18 +6,18 @@
  *
  * @param digitalPin The digital pin that state we are waiting for
  * @param expectedState LOW or HIGH
- * @param timeoutUS The max time that the state has to be the given one
+ * @param timeoutMS The max time that the state has to be the given one
  * @return If there was a timeout.
  */
-bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
+bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutMS) {
 
     pinMode(digitalPin, INPUT);
 
-    unsigned long start = micros();
+    unsigned long start = millis();
 
     while (digitalRead(digitalPin) != expectedState) {
 
-        if (micros() - start >= timeoutUS)
+        if (millis() - start >= timeoutMS)
             return true;
     }
 
@@ -30,18 +30,18 @@ bool waitStateNot(const unsigned int& digitalPin, const char& expectedState, con
  *
  * @param digitalPin The digital pin that state we are waiting for
  * @param expectedState LOW or HIGH
- * @param timeoutUS The max time that the state has to be the given one
+ * @param timeoutMS The max time that the state has to be the given one
  * @return If there was a timeout.
  */
-bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutUS) {
+bool waitStateIs(const unsigned int& digitalPin, const char& expectedState, const unsigned long& timeoutMS) {
 
     pinMode(digitalPin, INPUT);
 
-    unsigned long start = micros();
+    unsigned long start = millis();
 
     while (digitalRead(digitalPin) == expectedState) {
 
-        if (micros() - start >= timeoutUS)
+        if (millis() - start >= timeoutMS)
             return true;
     }
 
@@ -80,17 +80,17 @@ unsigned long measureSignalLength(const uint8_t& pin, const int& mode) {
  * @param mode HIGH or LOW
  * @return The data of the measurement. If there was a timeout, then the signal length will be 0 and the timeout - true
  */
-SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const char& mode, const unsigned long& timeoutUS) {
+SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const char& mode, const unsigned long& timeoutMS) {
 
     pinMode(pin, INPUT);
 
-    bool isWaitingTimedOut = waitStateNot(pin, mode, timeoutUS);
+    bool isWaitingTimedOut = waitStateNot(pin, mode, timeoutMS);
 
     if (isWaitingTimedOut)
         return SignalLengthMeasurementUS{0, true};
 
     unsigned long signalLengthStart = micros();
-    bool isMeasuringTimedOut = waitStateIs(pin, mode, timeoutUS);
+    bool isMeasuringTimedOut = waitStateIs(pin, mode, timeoutMS);
 
     if (isMeasuringTimedOut)
         return SignalLengthMeasurementUS{0, true};

@@ -12,8 +12,8 @@
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
 #define COOL_DOWN_DELAY_MS 60
 
-#define DEFAULT_RESPONSE_TIMEOUT_US 1000000
-#define DEFAULT_SAMPLES 1
+#define DEFAULT_RESPONSE_TIMEOUT_MS 500
+#define DEFAULT_SAMPLES 3
 #define DEFAULT_TEMPERATURE_CELSIUS 25.00f
 #define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
 
@@ -42,7 +42,7 @@ private:
     DistanceUnit defaultMaxDistanceUnit;
     float defaultTemperatureValue;
     TemperatureUnit defaultTemperatureUnit;
-    unsigned long defaultResponseTimeoutUS;
+    unsigned long defaultResponseTimeoutMS;
     DistanceUnit defaultMeasurementDistanceUnit;
 
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed, const DistanceUnit& distanceUnit);
@@ -53,9 +53,9 @@ private:
 
     void sendTriggerSignalToHCSR04();
 
-    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS);
+    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& defaultResponseTimeoutMS);
 
-    HCSR04Response sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS);
+    HCSR04Response sendAndReceivedToHCSR04(const unsigned long& defaultResponseTimeoutMS);
 
     void setDefaultSamples(const unsigned int& defaultSamples);
 
@@ -67,7 +67,7 @@ private:
 
     void setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperatureUnit);
 
-    void setDefaultResponseTimeoutUs(const unsigned long& defaultResponseTimeoutUs);
+    void setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS);
 
     void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
 
@@ -89,6 +89,8 @@ public:
     HCSR04(const uint8_t& oneWirePin);
 
     HCSR04(const uint8_t& triggerPin, const uint8_t& echoPin);
+
+    Measurement measure();
 
     Measurement measure(const MeasurementConfiguration& configuration);
 };

@@ -24,7 +24,7 @@ void HCSR04::initializeDefaults() {
     this->defaultMaxDistanceUnit = DistanceUnit::CENTIMETERS;
     this->defaultTemperatureValue = DEFAULT_TEMPERATURE_CELSIUS;
     this->defaultTemperatureUnit = TemperatureUnit::CELSIUS;
-    this->defaultResponseTimeoutUS = DEFAULT_RESPONSE_TIMEOUT_US;
+    this->defaultResponseTimeoutMS = DEFAULT_RESPONSE_TIMEOUT_MS;
     this->defaultMeasurementDistanceUnit = DistanceUnit::CENTIMETERS;
 }
 
@@ -108,15 +108,15 @@ void HCSR04::sendTriggerSignalToHCSR04() {
  * Will send a request for measurement to the HCSR04 and wait for its response.
  * If the response doesn't arrive in the given timeout time, then it will be time outed
  *
- * @param responseTimeOutUS The maximum time that the response has to arrive
+ * @param responseTimeOutMS The maximum time that the response has to arrive
  * @return The results from the measurement.
  */
-HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutUS) {
+HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutMS) {
 
     this->sendTriggerSignalToHCSR04();
 
     uint8_t measurementPin = this->isOneWireMode ? this->oneWirePin : this->echoPin;
-    SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(measurementPin, HIGH, responseTimeOutUS);
+    SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(measurementPin, HIGH, responseTimeOutMS);
 
     delay(COOL_DOWN_DELAY_MS);
     return {signalLengthMeasurementUs.signalLengthUS, signalLengthMeasurementUs.isTimedOut};
@@ -128,12 +128,12 @@ HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTime
  *
  * @param hcsr04Responses The array, which will be filled with the responses
  * @param times The measurements to take
- * @param responseTimeOutUS The maximum time that a response has to arrive
+ * @param responseTimeOutMS The maximum time that a response has to arrive
  */
-void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutUS) {
+void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutMS) {
 
     for (int i = 0; i < times; i++)
-        hcsr04Responses[i] = this->sendAndReceivedToHCSR04(responseTimeOutUS);
+        hcsr04Responses[i] = this->sendAndReceivedToHCSR04(responseTimeOutMS);
 }
 
 /**
@@ -145,10 +145,10 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
  */
 void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const MeasurementConfiguration& measurementConfiguration) {
 
-    unsigned long responseTimeOutUS = measurementConfiguration.getResponseTimeoutUS().orElseGet(this->defaultResponseTimeoutUS);
+    unsigned long responseTimeOutMS = measurementConfiguration.getResponseTimeoutMS().orElseGet(this->defaultResponseTimeoutMS);
     unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
 
-    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutUS);
+    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutMS);
 }
 
 /**
@@ -242,6 +242,14 @@ float HCSR04::calculateAverage(HCSR04Response hcsr04Responses[], const unsigned 
 }
 
 /**
+ * Will do a measurement with the default values.
+ * They are these in the macros in the header file.
+ */
+Measurement HCSR04::measure() {
+    return this->measure(MeasurementConfiguration::builder().build());
+}
+
+/**
  * Will do a measurement/s based on the provided configuration.
  */
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
@@ -280,8 +288,8 @@ void HCSR04::setDefaultTemperatureUnit(const TemperatureUnit& defaultTemperature
     HCSR04::defaultTemperatureUnit = defaultTemperatureUnit;
 }
 
-void HCSR04::setDefaultResponseTimeoutUs(const unsigned long& defaultResponseTimeoutUs) {
-    defaultResponseTimeoutUS = defaultResponseTimeoutUs;
+void HCSR04::setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS) {
+    HCSR04::defaultResponseTimeoutMS = defaultResponseTimeoutMS;
 }
 
 void HCSR04::setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit) {
