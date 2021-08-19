@@ -1,7 +1,7 @@
 #ifndef HC_SR04_MEASUREMENT_H
 #define HC_SR04_MEASUREMENT_H
 
-#include "DistanceUnits.h"
+#include "hcsr04/DistanceUnits.h"
 
 class Measurement {
 

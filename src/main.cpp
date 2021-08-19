@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SerialPrintF.h>
-#include "HCSR04.h"
+#include "hcsr04/HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9

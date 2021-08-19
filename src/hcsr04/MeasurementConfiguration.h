@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "TemperatureUnits.h"
-#include "DistanceUnits.h"
+#include "hcsr04/DistanceUnits.h"
 #include "Optional.h"
 
 class MeasurementConfiguration {

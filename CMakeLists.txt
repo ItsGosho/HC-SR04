@@ -30,4 +30,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/HCSR04.h src/HCSR04.cpp src/HCSR04.h src/TemperatureUnits.h src/TemperatureUnits.cpp src/DistanceUnits.cpp src/DistanceUnits.h src/Utils.cpp src/Utils.h src/Optional.h src/Measurement.cpp src/Measurement.h src/HCSR04Response.cpp src/HCSR04Response.h src/HCSR04ResponseErrors.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/hcsr04/HCSR04.h src/hcsr04/HCSR04.cpp src/hcsr04/HCSR04.h src/hcsr04/TemperatureUnits.h src/hcsr04/TemperatureUnits.cpp src/hcsr04/DistanceUnits.cpp src/hcsr04/DistanceUnits.h src/hcsr04/Utils.cpp src/hcsr04/Utils.h src/hcsr04/Optional.h src/hcsr04/Measurement.cpp src/hcsr04/Measurement.h src/hcsr04/HCSR04Response.cpp src/hcsr04/HCSR04Response.h src/hcsr04/HCSR04ResponseErrors.h)
