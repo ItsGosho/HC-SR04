@@ -18,7 +18,7 @@ private:
     unsigned long* responseTimeoutMS;
     DistanceUnit* measurementDistanceUnit;
 
-    unsigned long* defaultResponseTimeoutCoolDownTimeMS;
+    unsigned long* responseTimeoutCoolDownTimeMS;
 
 public:
     class builder;
@@ -30,7 +30,7 @@ public:
                              TemperatureUnit* temperatureUnit,
                              unsigned long* responseTimeoutMS,
                              DistanceUnit* measurementDistanceUnit,
-                             unsigned long* defaultResponseTimeoutCoolDownTimeMS
+                             unsigned long* responseTimeoutCoolDownTimeMS
                              )
                              :
                              samples(samples),
@@ -40,7 +40,7 @@ public:
                              temperatureUnit(temperatureUnit),
                              responseTimeoutMS(responseTimeoutMS),
                              measurementDistanceUnit(measurementDistanceUnit),
-                             defaultResponseTimeoutCoolDownTimeMS(defaultResponseTimeoutCoolDownTimeMS)
+                             responseTimeoutCoolDownTimeMS(responseTimeoutCoolDownTimeMS)
                              {
     }
 
@@ -72,8 +72,8 @@ public:
         return {this->measurementDistanceUnit};
     }
 
-    Optional<unsigned long> getDefaultResponseTimeoutCoolDownTimeMS() const {
-        return {this->defaultResponseTimeoutCoolDownTimeMS};
+    Optional<unsigned long> getResponseTimeoutCoolDownTimeMS() const {
+        return {this->responseTimeoutCoolDownTimeMS};
     }
 };
 
@@ -88,7 +88,7 @@ private:
     unsigned long* mResponseTimeoutMS;
     DistanceUnit* mMeasurementDistanceUnit;
 
-    unsigned long* mDefaultResponseTimeoutCoolDownTimeMS;
+    unsigned long* mResponseTimeoutCoolDownTimeMS;
 
 public:
     builder() {
@@ -99,7 +99,7 @@ public:
         this->mTemperatureUnit = nullptr;
         this->mResponseTimeoutMS = nullptr;
         this->mMeasurementDistanceUnit = nullptr;
-        this->mDefaultResponseTimeoutCoolDownTimeMS = nullptr;
+        this->mResponseTimeoutCoolDownTimeMS = nullptr;
     }
 
     /**
@@ -147,11 +147,14 @@ public:
         return *this;
     }
 
-    /*
-     * TODO: DOC
-     * */
-    builder& withDefaultResponseTimeoutCoolDown(const unsigned long& defaultResponseTimeoutCoolDownTimeMS) {
-        this->mDefaultResponseTimeoutCoolDownTimeMS = &const_cast<unsigned long&>(defaultResponseTimeoutCoolDownTimeMS);
+    /**
+      * Let's say that you have a measurement in your program with **5** samples.
+      * If the **HCSR04** is not connected, then there will be no samples, but you will lose time for example **~315 milliseconds** on **each loop**.
+      * To avoid that and you can try measuring after specific time again. That is where the cooldowns come.
+      * The cool down will be **activated**, when **all of the samples** that have been measured have **timed out**. If a **measurement fails again**, then it will be **activated again** and so on.
+      */
+    builder& withResponseTimeoutCoolDown(const unsigned long& responseTimeoutCoolDownTimeMS) {
+        this->mResponseTimeoutCoolDownTimeMS = &const_cast<unsigned long&>(responseTimeoutCoolDownTimeMS);
         return *this;
     }
 
@@ -163,7 +166,7 @@ public:
                 this->mTemperatureUnit,
                 this->mResponseTimeoutMS,
                 this->mMeasurementDistanceUnit,
-                this->mDefaultResponseTimeoutCoolDownTimeMS};
+                this->mResponseTimeoutCoolDownTimeMS};
     }
 
 };

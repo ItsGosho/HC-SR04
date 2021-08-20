@@ -234,7 +234,7 @@ float HCSR04::calculateAverage(HCSR04Response hcsr04Responses[], const unsigned 
 
 bool HCSR04::isResponseCoolDownRequired(HCSR04Response hcsr04Responses[], const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration) {
 
-    if (!measurementConfiguration.getDefaultResponseTimeoutCoolDownTimeMS().has())
+    if (!measurementConfiguration.getResponseTimeoutCoolDownTimeMS().has())
         return false;
 
     unsigned int timedOutResponsesCount = 0;
@@ -248,7 +248,7 @@ bool HCSR04::isResponseCoolDownRequired(HCSR04Response hcsr04Responses[], const 
 }
 
 void HCSR04::applyResponseCoolDown(const MeasurementConfiguration& measurementConfiguration) {
-    unsigned int responseTimeoutCoolDownTimeMS = measurementConfiguration.getDefaultResponseTimeoutCoolDownTimeMS().orElseGet(this->defaultResponseTimeoutCoolDownTimeMS);
+    unsigned int responseTimeoutCoolDownTimeMS = measurementConfiguration.getResponseTimeoutCoolDownTimeMS().orElseGet(this->defaultResponseTimeoutCoolDownTimeMS);
 
     this->responseCoolDownEndMS = millis() + responseTimeoutCoolDownTimeMS;
 }
@@ -334,7 +334,10 @@ void HCSR04::setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasur
 }
 
 /**
- * TODO: DOC
+ * Let's say that you have a measurement in your program with **5** samples.
+ * If the **HCSR04** is not connected, then there will be no samples, but you will lose time for example **~315 milliseconds** on **each loop**.
+ * To avoid that and you can try measuring after specific time again. That is where the cooldowns come.
+ * The cool down will be **activated**, when **all of the samples** that have been measured have **timed out**. If a **measurement fails again**, then it will be **activated again** and so on.
  */
 void HCSR04::setDefaultResponseTimeoutCoolDownMS(const unsigned long& defaultResponseTimeoutCoolDownTimeMS) {
     HCSR04::defaultResponseTimeoutCoolDownTimeMS = defaultResponseTimeoutCoolDownTimeMS;

@@ -47,17 +47,18 @@ void setup() {
 }
 
 void loop() {
-    
+
     Measurement measurement = hcsr04.measure();
 
     serial_printf(Serial,
-                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
+                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i, Response Cool Down: %o]\n",
                   measurement.getDistance(), getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
                   measurement.getValidMeasurementsCount(),
                   measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
-                  measurement.getMaxDistanceExceededCount());
+                  measurement.getMaxDistanceExceededCount(),
+                  measurement.getIsResponseCoolDownActive());
 }
 ```
 
@@ -81,6 +82,7 @@ void setup() {
     hcsr04.setDefaultMaxDistance(1, DistanceUnit::METERS);
     hcsr04.setDefaultMeasurementDistanceUnit(DistanceUnit::CENTIMETERS);
     hcsr04.setDefaultResponseTimeoutMS(300);
+    hcsr04.setDefaultResponseTimeoutCoolDownMS(5000);
 }
 
 void loop() {
@@ -89,13 +91,15 @@ void loop() {
     Measurement measurement = hcsr04.measure();
 
     serial_printf(Serial,
-                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
-                  measurement.getDistance(), getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
+                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i, Response Cool Down: %o]\n",
+                  measurement.getDistance(),
+                  getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
                   measurement.getValidMeasurementsCount(),
                   measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
-                  measurement.getMaxDistanceExceededCount());
+                  measurement.getMaxDistanceExceededCount(),
+                  measurement.getIsResponseCoolDownActive());
 }
 ```
 
@@ -120,21 +124,24 @@ void loop() {
 
     Measurement measurement = hcsr04.measure(
             MeasurementConfiguration::builder()
-                        .withSamples(5)
-                        .withTemperature(21.55,TemperatureUnit::CELSIUS)
-                        .withMaxDistance(1,DistanceUnit::METERS)
-                        .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
-                        .withResponseTimeoutMS(300)
-                        .build());
-    
+                    .withSamples(5)
+                    .withTemperature(21.55,TemperatureUnit::CELSIUS)
+                    .withMaxDistance(1,DistanceUnit::METERS)
+                    .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
+                    .withResponseTimeoutMS(300)
+                    .withResponseTimeoutCoolDown(5000)
+                    .build());
+
     serial_printf(Serial,
-                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
-                  measurement.getDistance(), getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
+                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i, Response Cool Down: %o]\n",
+                  measurement.getDistance(),
+                  getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
                   measurement.getValidMeasurementsCount(),
                   measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
-                  measurement.getMaxDistanceExceededCount());
+                  measurement.getMaxDistanceExceededCount(),
+                  measurement.getIsResponseCoolDownActive());
 }
 ```
 
@@ -162,21 +169,24 @@ void loop() {
 
     Measurement measurement = hcsr04.measure(
             MeasurementConfiguration::builder()
-                        .withSamples(5)
-                        .withTemperature(21.55,TemperatureUnit::CELSIUS)
-                        .withMaxDistance(1,DistanceUnit::METERS)
-                        .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
-                        .withResponseTimeoutMS(300)
-                        .build());
+                    .withSamples(5)
+                    .withTemperature(21.55,TemperatureUnit::CELSIUS)
+                    .withMaxDistance(1,DistanceUnit::METERS)
+                    .withMeasurementDistanceUnit(DistanceUnit::CENTIMETERS)
+                    .withResponseTimeoutMS(300)
+                    .withResponseTimeoutCoolDown(5000)
+                    .build());
 
     serial_printf(Serial,
-                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i]\n",
-                  measurement.getDistance(), getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
+                  "Distance: %2f %s, Valid Samples: %l/%i [Signal Timed Out Count: %i, Response Timed Out Count: %i, Max Distance Exceeded Count: %i, Response Cool Down: %o]\n",
+                  measurement.getDistance(),
+                  getDistanceUnitAbbreviation(measurement.getDistanceUnit()),
                   measurement.getValidMeasurementsCount(),
                   measurement.getTakenSamples(),
                   measurement.getSignalTimedOutCount(),
                   measurement.getResponseTimedOutCount(),
-                  measurement.getMaxDistanceExceededCount());
+                  measurement.getMaxDistanceExceededCount(),
+                  measurement.getIsResponseCoolDownActive());
 }
 ```
 
@@ -232,7 +242,7 @@ That creates a priority, for example:
 
 Let's say that you have a measurement in your program with **5** samples. If the **HCSR04** is not connected, then there will be no samples, but you will lose time for example **~315 milliseconds** on **each loop**.
 
-To avoid that and you can try measuring after specific time again. That is where the cooldowns come.
+To avoid that and you can try measuring after specific time again. That is where the cool downs come.
 
 The cooldown will be **activated**, when **all of the samples** that have been measured have **timed out**. If a **measurement fails again**, then it will be **activated again** and so on.
 
