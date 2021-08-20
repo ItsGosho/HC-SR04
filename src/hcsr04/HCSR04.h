@@ -12,10 +12,11 @@
 #define TIMEOUT_SIGNAL_LENGTH_US 38000
 #define COOL_DOWN_DELAY_MS 60
 
-#define DEFAULT_RESPONSE_TIMEOUT_MS 75
+#define DEFAULT_RESPONSE_TIMEOUT_MS 100
 #define DEFAULT_SAMPLES 3
 #define DEFAULT_TEMPERATURE_CELSIUS 25.00f
 #define DEFAULT_MAX_DISTANCE_CENTIMETERS 400.00f
+#define DEFAULT_RESPONSE_COOL_DOWN_MS 0
 
 /*
  * TODO: ONE WIRE MODE
@@ -44,6 +45,10 @@ private:
     TemperatureUnit defaultTemperatureUnit;
     unsigned long defaultResponseTimeoutMS;
     DistanceUnit defaultMeasurementDistanceUnit;
+    unsigned long defaultResponseTimeoutCoolDownTimeMS;
+
+    unsigned long responseCoolDownEndMS;
+
 
     float calculateDistanceBySignalLengthAndSoundSpeed(const unsigned int& signalLength, const float& soundSpeed, const DistanceUnit& distanceUnit);
 
@@ -53,9 +58,7 @@ private:
 
     void sendTriggerSignalToHCSR04();
 
-    void sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& defaultResponseTimeoutMS);
-
-    HCSR04Response sendAndReceivedToHCSR04(const unsigned long& defaultResponseTimeoutMS);
+    HCSR04Response sendAndReceivedToHCSR04(const MeasurementConfiguration& measurementConfiguration);
 
     bool isMaxDistanceExceeded(const HCSR04Response& hcsr04Response, const MeasurementConfiguration& measurementConfiguration);
 
@@ -89,6 +92,14 @@ public:
     void setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTimeoutMS);
 
     void setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit);
+
+    void setDefaultResponseTimeoutCoolDownMS(const unsigned long& defaultResponseTimeoutCoolDownTimeMS);
+
+    bool isResponseCoolDownRequired(HCSR04Response* hcsr04Responses, const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration);
+
+    void applyResponseCoolDown(const MeasurementConfiguration& measurementConfiguration);
+
+    bool isResponseCoolDownActive();
 };
 
 

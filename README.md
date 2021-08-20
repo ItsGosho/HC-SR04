@@ -11,12 +11,12 @@ Arduino communication library for the HC-SR04 ultrasonic sensor.
 
   - Global, Dynamic, Combined parameter specification
   - Builder
-
-  - Specify samples
+- Specify samples
   - Specify temperature (Celsius, Fahrenheit)
   - Specify measurement distance (Centimeters, Meters, Inches, Foot, Yards)
   - Specify max distance (Centimeters, Meters, Inches, Foot, Yards)
   - Specify response timeout (Milliseconds)
+  - Specify cooldowns (Milliseconds)
 
 - One & Two wire mode.
 
@@ -26,7 +26,7 @@ Arduino communication library for the HC-SR04 ultrasonic sensor.
 
 In the examples the HC-SR04 is used in **one wire mode**. The library **supports one and two wires**.
 
-Copy the content of the `src/hcsr04` folder and place it in your project.
+Copy the content of the `src/hcsr04` folder and place them in your project.
 
 
 
@@ -35,7 +35,7 @@ Copy the content of the `src/hcsr04` folder and place it in your project.
 ```c++
 #include <Arduino.h>
 #include <SerialPrintF.h>
-#include "HCSR04.h"
+#include "hcsr04/HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9
@@ -66,7 +66,7 @@ void loop() {
 ```c++
 #include <Arduino.h>
 #include <SerialPrintF.h>
-#include "HCSR04.h"
+#include "hcsr04/HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9
@@ -104,7 +104,7 @@ void loop() {
 ```c++
 #include <Arduino.h>
 #include <SerialPrintF.h>
-#include "HCSR04.h"
+#include "hcsr04/HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9
@@ -143,7 +143,7 @@ void loop() {
 ```c++
 #include <Arduino.h>
 #include <SerialPrintF.h>
-#include "HCSR04.h"
+#include "hcsr04/HCSR04.h"
 
 #define SERIAL_BAUD_RATE 9600
 #define HCSR04_ONE_WIRE_PIN 9
@@ -216,7 +216,7 @@ That creates a priority, for example:
 
   Increases the accuracy of the measurement, because the sound speed is dependent on temperature.
 
-###### Response Timeout: (75 milliseconds)
+###### Response Timeout: (100 milliseconds)
 
   The maximum time to take a measurement.
 
@@ -227,6 +227,14 @@ That creates a priority, for example:
 ###### Measurement Distance Unit: (Centimeters)
 
   In what distance unit the measurement will be returned.
+
+###### Response Cool Down: (0 milliseconds)
+
+Let's say that you have a measurement in your program with **5** samples. If the **HCSR04** is not connected, then there will be no samples, but you will lose time for example **~315 milliseconds** on **each loop**.
+
+To avoid that and you can try measuring after specific time again. That is where the cooldowns come.
+
+The cooldown will be **activated**, when **all of the samples** that have been measured have **timed out**. If a **measurement fails again**, then it will be **activated again** and so on.
 
 
 

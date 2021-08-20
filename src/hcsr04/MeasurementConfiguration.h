@@ -18,11 +18,30 @@ private:
     unsigned long* responseTimeoutMS;
     DistanceUnit* measurementDistanceUnit;
 
+    unsigned long* defaultResponseTimeoutCoolDownTimeMS;
+
 public:
     class builder;
 
-    MeasurementConfiguration(unsigned int* samples, float* maxDistanceValue, DistanceUnit* maxDistanceUnit, float* temperatureValue, TemperatureUnit* temperatureUnit, unsigned long* responseTimeoutMS, DistanceUnit* measurementDistanceUnit)
-            : samples(samples), maxDistanceValue(maxDistanceValue), maxDistanceUnit(maxDistanceUnit), temperatureValue(temperatureValue), temperatureUnit(temperatureUnit), responseTimeoutMS(responseTimeoutMS), measurementDistanceUnit(measurementDistanceUnit) {
+    MeasurementConfiguration(unsigned int* samples,
+                             float* maxDistanceValue,
+                             DistanceUnit* maxDistanceUnit,
+                             float* temperatureValue,
+                             TemperatureUnit* temperatureUnit,
+                             unsigned long* responseTimeoutMS,
+                             DistanceUnit* measurementDistanceUnit,
+                             unsigned long* defaultResponseTimeoutCoolDownTimeMS
+                             )
+                             :
+                             samples(samples),
+                             maxDistanceValue(maxDistanceValue),
+                             maxDistanceUnit(maxDistanceUnit),
+                             temperatureValue(temperatureValue),
+                             temperatureUnit(temperatureUnit),
+                             responseTimeoutMS(responseTimeoutMS),
+                             measurementDistanceUnit(measurementDistanceUnit),
+                             defaultResponseTimeoutCoolDownTimeMS(defaultResponseTimeoutCoolDownTimeMS)
+                             {
     }
 
     Optional<unsigned int> getSamples() const {
@@ -52,9 +71,12 @@ public:
     Optional<DistanceUnit> getMeasurementDistanceUnit() const {
         return {this->measurementDistanceUnit};
     }
+
+    Optional<unsigned long> getDefaultResponseTimeoutCoolDownTimeMS() const {
+        return {this->defaultResponseTimeoutCoolDownTimeMS};
+    }
 };
 
-/*TODO: Explain each of the withX parameters/methods*/
 class MeasurementConfiguration::builder {
 
 private:
@@ -66,6 +88,8 @@ private:
     unsigned long* mResponseTimeoutMS;
     DistanceUnit* mMeasurementDistanceUnit;
 
+    unsigned long* mDefaultResponseTimeoutCoolDownTimeMS;
+
 public:
     builder() {
         this->mSamples = nullptr;
@@ -75,6 +99,7 @@ public:
         this->mTemperatureUnit = nullptr;
         this->mResponseTimeoutMS = nullptr;
         this->mMeasurementDistanceUnit = nullptr;
+        this->mDefaultResponseTimeoutCoolDownTimeMS = nullptr;
     }
 
     /**
@@ -122,8 +147,23 @@ public:
         return *this;
     }
 
+    /*
+     * TODO: DOC
+     * */
+    builder& withDefaultResponseTimeoutCoolDown(const unsigned long& defaultResponseTimeoutCoolDownTimeMS) {
+        this->mDefaultResponseTimeoutCoolDownTimeMS = &const_cast<unsigned long&>(defaultResponseTimeoutCoolDownTimeMS);
+        return *this;
+    }
+
     MeasurementConfiguration build() const {
-        return {this->mSamples, this->mMaxDistanceValue, this->mMaxDistanceUnit, this->mTemperatureValue, this->mTemperatureUnit, this->mResponseTimeoutMS, this->mMeasurementDistanceUnit};
+        return {this->mSamples,
+                this->mMaxDistanceValue,
+                this->mMaxDistanceUnit,
+                this->mTemperatureValue,
+                this->mTemperatureUnit,
+                this->mResponseTimeoutMS,
+                this->mMeasurementDistanceUnit,
+                this->mDefaultResponseTimeoutCoolDownTimeMS};
     }
 
 };

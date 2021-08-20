@@ -26,6 +26,8 @@ void HCSR04::initializeDefaults() {
     this->defaultTemperatureUnit = TemperatureUnit::CELSIUS;
     this->defaultResponseTimeoutMS = DEFAULT_RESPONSE_TIMEOUT_MS;
     this->defaultMeasurementDistanceUnit = DistanceUnit::CENTIMETERS;
+    this->defaultResponseTimeoutCoolDownTimeMS = DEFAULT_RESPONSE_COOL_DOWN_MS;
+    this->responseCoolDownEndMS = DEFAULT_RESPONSE_COOL_DOWN_MS;
 }
 
 /**
@@ -111,29 +113,18 @@ void HCSR04::sendTriggerSignalToHCSR04() {
  * @param responseTimeOutMS The maximum time that the response has to arrive
  * @return The results from the measurement.
  */
-HCSR04Response HCSR04::sendAndReceivedToHCSR04(const unsigned long& responseTimeOutMS) {
+HCSR04Response HCSR04::sendAndReceivedToHCSR04(const MeasurementConfiguration& measurementConfiguration) {
+
+    unsigned long responseTimeOutMS = measurementConfiguration.getResponseTimeoutMS().orElseGet(this->defaultResponseTimeoutMS);
+
+    uint8_t measurementPin = this->isOneWireMode ? this->oneWirePin : this->echoPin;
 
     this->sendTriggerSignalToHCSR04();
 
-    uint8_t measurementPin = this->isOneWireMode ? this->oneWirePin : this->echoPin;
     SignalLengthMeasurementUS signalLengthMeasurementUs = measureSignalLength(measurementPin, HIGH, responseTimeOutMS);
 
     delay(COOL_DOWN_DELAY_MS);
     return {signalLengthMeasurementUs.signalLengthUS, signalLengthMeasurementUs.isTimedOut};
-}
-
-/**
- * Will send a multiple requests for measurement to the HCSR04 and wait for their responses.
- * If a response doesn't arrive in the given timeout time, then it will be time outed, but still collected.
- *
- * @param hcsr04Responses The array, which will be filled with the responses
- * @param times The measurements to take
- * @param responseTimeOutMS The maximum time that a response has to arrive
- */
-void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const unsigned int& times, const unsigned long& responseTimeOutMS) {
-
-    for (int i = 0; i < times; i++)
-        hcsr04Responses[i] = this->sendAndReceivedToHCSR04(responseTimeOutMS);
 }
 
 /**
@@ -145,10 +136,10 @@ void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const uns
  */
 void HCSR04::sendAndReceivedToHCSR04(HCSR04Response hcsr04Responses[], const MeasurementConfiguration& measurementConfiguration) {
 
-    unsigned long responseTimeOutMS = measurementConfiguration.getResponseTimeoutMS().orElseGet(this->defaultResponseTimeoutMS);
     unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
 
-    this->sendAndReceivedToHCSR04(hcsr04Responses, samples, responseTimeOutMS);
+    for (int i = 0; i < samples; i++)
+        hcsr04Responses[i] = this->sendAndReceivedToHCSR04(measurementConfiguration);
 }
 
 /**
@@ -241,6 +232,35 @@ float HCSR04::calculateAverage(HCSR04Response hcsr04Responses[], const unsigned 
     return distancesSum / (validSamples == 0 ? 1 : static_cast<float>(validSamples));
 }
 
+bool HCSR04::isResponseCoolDownRequired(HCSR04Response hcsr04Responses[], const unsigned int& responsesCount, const MeasurementConfiguration& measurementConfiguration) {
+
+    if (!measurementConfiguration.getDefaultResponseTimeoutCoolDownTimeMS().has())
+        return false;
+
+    unsigned int timedOutResponsesCount = 0;
+
+    for (int i = 0; i < responsesCount; i++) {
+        HCSR04Response hcsr04Response = hcsr04Responses[i];
+        timedOutResponsesCount += hcsr04Response.isResponseTimedOut() ? 1 : 0;
+    }
+
+    return timedOutResponsesCount == responsesCount;
+}
+
+void HCSR04::applyResponseCoolDown(const MeasurementConfiguration& measurementConfiguration) {
+    unsigned int responseTimeoutCoolDownTimeMS = measurementConfiguration.getDefaultResponseTimeoutCoolDownTimeMS().orElseGet(this->defaultResponseTimeoutCoolDownTimeMS);
+
+    this->responseCoolDownEndMS = millis() + responseTimeoutCoolDownTimeMS;
+}
+
+bool HCSR04::isResponseCoolDownActive() {
+
+    if(this->responseCoolDownEndMS == 0)
+        return false;
+
+    return millis() <= this->responseCoolDownEndMS;
+}
+
 /**
  * Will do a measurement with the default values.
  * They are these in the macros in the header file.
@@ -254,6 +274,9 @@ Measurement HCSR04::measure() {
  */
 Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfiguration) {
 
+    if (this->isResponseCoolDownActive())
+        return Measurement{0, DistanceUnit::CENTIMETERS, 0, 0, 0, 0, true};
+
     unsigned int samples = measurementConfiguration.getSamples().orElseGet(this->defaultSamples);
     DistanceUnit measurementDistanceUnit = measurementConfiguration.getMeasurementDistanceUnit().orElseGet(this->defaultMeasurementDistanceUnit);;
 
@@ -261,10 +284,13 @@ Measurement HCSR04::measure(const MeasurementConfiguration& measurementConfigura
 
     this->sendAndReceivedToHCSR04(hcsr04Responses, measurementConfiguration);
 
+    if (this->isResponseCoolDownRequired(hcsr04Responses, samples, measurementConfiguration))
+        this->applyResponseCoolDown(measurementConfiguration);
+
     HCSR04ResponseErrors hcsr04ResponseErrors = this->countResponseErrors(hcsr04Responses, samples, measurementConfiguration);
     float averageDistance = this->calculateAverage(hcsr04Responses, samples, measurementConfiguration);
 
-    return Measurement{averageDistance, measurementDistanceUnit, samples, hcsr04ResponseErrors.signalTimedOutCount, hcsr04ResponseErrors.responseTimedOutCount, hcsr04ResponseErrors.maxDistanceExceededCount};;
+    return Measurement{averageDistance, measurementDistanceUnit, samples, hcsr04ResponseErrors.signalTimedOutCount, hcsr04ResponseErrors.responseTimedOutCount, hcsr04ResponseErrors.maxDistanceExceededCount, false};
 }
 
 /**
@@ -305,4 +331,11 @@ void HCSR04::setDefaultResponseTimeoutMS(const unsigned long& defaultResponseTim
  */
 void HCSR04::setDefaultMeasurementDistanceUnit(const DistanceUnit& defaultMeasurementDistanceUnit) {
     HCSR04::defaultMeasurementDistanceUnit = defaultMeasurementDistanceUnit;
+}
+
+/**
+ * TODO: DOC
+ */
+void HCSR04::setDefaultResponseTimeoutCoolDownMS(const unsigned long& defaultResponseTimeoutCoolDownTimeMS) {
+    HCSR04::defaultResponseTimeoutCoolDownTimeMS = defaultResponseTimeoutCoolDownTimeMS;
 }
