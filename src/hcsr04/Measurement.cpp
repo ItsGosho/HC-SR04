@@ -6,12 +6,24 @@ Measurement::Measurement() {
     this->signalTimedOutCount = 0;
     this->responseTimedOutCount = 0;
     this->maxDistanceExceededCount = 0;
+    this->isResponseCoolDownActive = false;
 }
 
-Measurement::Measurement(float distance, DistanceUnit distanceUnit, unsigned int takenSamples, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount)
-        : distance(distance), distanceUnit(distanceUnit), takenSamples(takenSamples), signalTimedOutCount(
-        signalTimedOutCount), responseTimedOutCount(responseTimedOutCount), maxDistanceExceededCount(
-        maxDistanceExceededCount) {
+Measurement::Measurement(float distance,
+                         DistanceUnit distanceUnit,
+                         unsigned int takenSamples,
+                         unsigned int signalTimedOutCount,
+                         unsigned int responseTimedOutCount,
+                         unsigned int maxDistanceExceededCount,
+                         bool isResponseCoolDownActive)
+                         :
+                         distance(distance),
+                         distanceUnit(distanceUnit),
+                         takenSamples(takenSamples),
+                         signalTimedOutCount(signalTimedOutCount),
+                         responseTimedOutCount(responseTimedOutCount),
+                         maxDistanceExceededCount(maxDistanceExceededCount),
+                         isResponseCoolDownActive(isResponseCoolDownActive){
 }
 
 
@@ -45,4 +57,8 @@ unsigned long Measurement::getInvalidMeasurementsCount() {
 
 unsigned long Measurement::getValidMeasurementsCount() {
     return this->takenSamples - this->getInvalidMeasurementsCount();
+}
+
+bool Measurement::getIsResponseCoolDownActive() const {
+    return this->isResponseCoolDownActive;
 }

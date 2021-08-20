@@ -15,11 +15,13 @@ private:
     unsigned int responseTimedOutCount;
     unsigned int maxDistanceExceededCount;
 
+    bool isResponseCoolDownActive;
+
 public:
 
     Measurement();
 
-    Measurement(float distance, DistanceUnit distanceUnit, unsigned int takenSamples, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount);
+    Measurement(float distance, DistanceUnit distanceUnit, unsigned int takenSamples, unsigned int signalTimedOutCount, unsigned int responseTimedOutCount, unsigned int maxDistanceExceededCount, bool isResponseCoolDownActive);
 
     float getDistance() const;
 
@@ -36,6 +38,8 @@ public:
     unsigned long getInvalidMeasurementsCount();
 
     unsigned long getValidMeasurementsCount();
+
+    bool getIsResponseCoolDownActive() const;
 };
 
 

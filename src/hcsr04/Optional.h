@@ -45,8 +45,12 @@ public:
         this->base = base;
     }
 
+    bool has() {
+        return this->base;
+    }
+
     B orElseGet(B value) {
-        return this->base ? *this->base : value;
+        return this->has() ? *this->base : value;
     }
 };
 
