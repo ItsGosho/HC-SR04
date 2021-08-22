@@ -82,19 +82,27 @@ unsigned long measureSignalLength(const uint8_t& pin, const int& mode) {
  */
 SignalLengthMeasurementUS measureSignalLength(const uint8_t& pin, const char& mode, const unsigned long& timeoutMS) {
 
+    noInterrupts();
     pinMode(pin, INPUT);
 
     bool isWaitingTimedOut = waitStateNot(pin, mode, timeoutMS);
 
-    if (isWaitingTimedOut)
+    if (isWaitingTimedOut) {
+        interrupts();
         return SignalLengthMeasurementUS{0, true};
+    }
+
 
     unsigned long signalLengthStart = micros();
     bool isMeasuringTimedOut = waitStateIs(pin, mode, timeoutMS);
 
-    if (isMeasuringTimedOut)
+    if (isMeasuringTimedOut) {
+        interrupts();
         return SignalLengthMeasurementUS{0, true};
+    }
 
     unsigned long signalLength = micros() - signalLengthStart;
+    interrupts();
+
     return {signalLength, false};
 }
